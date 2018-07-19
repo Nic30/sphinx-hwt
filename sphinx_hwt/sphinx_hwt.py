@@ -35,8 +35,8 @@ class HwtSchematicDirective(Directive):
 
         # build dir path
         # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
-        targetid = "hwt-schematic-%d" % env.new_serialno('hwt-schematic')
-        targetnode = nodes.target('', '', ids=[targetid])
+        #targetid = "hwt-schematic-%d" % env.new_serialno('hwt-schematic')
+        #targetnode = nodes.target('', '', ids=[targetid])
 
         schema_node = SchematicLink()
         # schema_node += nodes.title(_('Schematic'), _('Todo'))
@@ -44,7 +44,7 @@ class HwtSchematicDirective(Directive):
                                 self.content_offset,
                                 schema_node)
 
-        return [targetnode, schema_node]
+        return [schema_node, ]
 
 
 def setup(app):
