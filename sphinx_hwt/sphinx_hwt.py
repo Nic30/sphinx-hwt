@@ -1,5 +1,7 @@
 from docutils.parsers.rst import Directive
+from docutils.parsers.rst.directives import flag, unchanged
 from docutils import nodes
+from docutils.parsers.rst.states import Body
 from sphinx.locale import _
 
 
@@ -15,10 +17,23 @@ class SchematicLink(nodes.Admonition, nodes.Element):
 
 
 class HwtSchematicDirective(Directive):
-
+    required_arguments = 0
+    optional_arguments = 0
+    has_content = True
+    option_spec = dict(module=unchanged, func=unchanged, ref=unchanged,
+                       prog=unchanged, path=unchanged, nodefault=flag,
+                       nodefaultconst=flag, filename=unchanged,
+                       manpage=unchanged, nosubcommands=unchanged, passparser=flag,
+                       noepilog=unchanged, nodescription=unchanged,
+                       markdown=flag, markdownhelp=flag)
     def run(self):
         env = self.state.document.settings.env
-
+        # docName = env.docname.
+        # document.attributes['source']
+        #objName = 
+        
+        # build dir path
+        # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
         targetid = "todo-%d" % env.new_serialno('todo')
         targetnode = nodes.target('', '', ids=[targetid])
 
