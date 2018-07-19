@@ -19,10 +19,11 @@ def assert_err_on_exit(err):
         raise AssertionError("Test exit with %d" % err)
 
 
-@patch('sys.exit', new=assert_err_on_exit)
-@patch('sys.stdout', new_callable=StringIO)
+# @patch('sys.exit', new=assert_err_on_exit)
+# @patch('sys.stdout', new_callable=StringIO)
 def _run_test(mock_stdout):
     rmtree("doc/", ignore_errors=True)
+    rmtree("doc_buld/", ignore_errors=True)
     
     # [OPTIONS] -o <OUTPUT_PATH> <MODULE_PATH> [EXCLUDE_PATTERN, ...]
     # apidoc_main(["-h"])
@@ -54,16 +55,21 @@ def run_test(name):
         # allow test modules import
         sys.path.append(".")
         
-        return _run_test()
+        return _run_test(None)
     finally:
         os.chdir(pwd)
         sys.path.pop()
 
 
 class HwtSchematic_directive_TC(unittest.TestCase):
+    def test_another_text(self):
+        run_test("test_another_text")
 
-    def test_test0(self):
-        run_test("test0")
+    def test_module(self):
+        run_test("test_module")
+
+    def test_package(self):
+        run_test("test_package")
 
 
 if __name__ == "__main__":

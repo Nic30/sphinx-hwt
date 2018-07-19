@@ -1,11 +1,10 @@
 from docutils.parsers.rst import Directive
-from docutils.parsers.rst.directives import flag, unchanged
 from docutils import nodes
-from docutils.parsers.rst.states import Body
 from sphinx.locale import _
+from sphinx.addnodes import desc_signature
 
 
-class SchematicLink(nodes.Admonition, nodes.Element):
+class SchematicLink(nodes.TextElement):
 
     @staticmethod
     def depart_html(self, node):
@@ -13,6 +12,15 @@ class SchematicLink(nodes.Admonition, nodes.Element):
 
     @staticmethod
     def visit_html(self, node):
+        parentClsNode = node.parent.parent
+        assert parentClsNode.attributes['objtype'] == 'class'
+        assert parentClsNode.attributes['domain'] == 'py'
+        sign = node.parent.parent.children[0]
+        assert isinstance(sign, desc_signature)
+        absoluteName = sign.attributes['ids'][0]
+        ref = nodes.reference(text="schematic", internal=False,
+                              refuri="viewer.html&%s.json" % absoluteName)
+        node += ref
         self.visit_admonition(node)
 
 
@@ -20,30 +28,23 @@ class HwtSchematicDirective(Directive):
     required_arguments = 0
     optional_arguments = 0
     has_content = True
-    option_spec = dict(module=unchanged, func=unchanged, ref=unchanged,
-                       prog=unchanged, path=unchanged, nodefault=flag,
-                       nodefaultconst=flag, filename=unchanged,
-                       manpage=unchanged, nosubcommands=unchanged, passparser=flag,
-                       noepilog=unchanged, nodescription=unchanged,
-                       markdown=flag, markdownhelp=flag)
+    option_spec = {}
+
     def run(self):
         env = self.state.document.settings.env
-        # docName = env.docname.
-        # document.attributes['source']
-        #objName = 
-        
+
         # build dir path
         # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
-        targetid = "todo-%d" % env.new_serialno('todo')
+        targetid = "hwt-schematic-%d" % env.new_serialno('hwt-schematic')
         targetnode = nodes.target('', '', ids=[targetid])
 
-        todo_node = SchematicLink('\n'.join(self.content))
-        # todo_node += nodes.title(_('Todo'), _('Todo'))
+        schema_node = SchematicLink()
+        # schema_node += nodes.title(_('Schematic'), _('Todo'))
         self.state.nested_parse(self.content,
                                 self.content_offset,
-                                todo_node)
+                                schema_node)
 
-        return [targetnode, todo_node]
+        return [targetnode, schema_node]
 
 
 def setup(app):
