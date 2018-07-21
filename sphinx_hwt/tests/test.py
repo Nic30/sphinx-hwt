@@ -27,8 +27,15 @@ def _run_test(mock_stdout):
     
     # [OPTIONS] -o <OUTPUT_PATH> <MODULE_PATH> [EXCLUDE_PATTERN, ...]
     # apidoc_main(["-h"])
-    apidoc_main(["--module-first", "--force", "--full",
-                 "--output-dir", "doc/", "."])
+    ret = apidoc_main(["--module-first", "--force", "--full",
+                       "--output-dir", "doc/", "."])
+    
+    if ret != 0:
+        sys.stderr.flush()
+        if mock_stdout is not None:
+            sys.stdout.flush()
+ 
+        raise AssertionError("apidoc_main failed with err %d" % ret)
     
     # -b buildername
     # -a If given, always write all output files. The default is to only write output files for new and changed source files. (This may not apply to all builders.)
@@ -37,11 +44,16 @@ def _run_test(mock_stdout):
     # [OPTIONS] SOURCEDIR OUTPUTDIR [FILENAMES...]
     
     # sphinx_main(["-h"])
-    sphinx_main(["-b", "html", "-E",
+    ret = sphinx_main(["-b", "html", "-E",
           "-c", pwd,
           "doc/",
           "doc_build/",
     ])
+    if ret != 0:
+        sys.stderr.flush()
+        if mock_stdout is not None:
+            sys.stdout.flush()
+        raise AssertionError("sphinx_main failed with err %d" % ret)
 
     return mock_stdout
 
@@ -62,6 +74,7 @@ def run_test(name):
 
 
 class HwtSchematic_directive_TC(unittest.TestCase):
+
     def test_another_text(self):
         run_test("test_another_text")
 
@@ -70,6 +83,10 @@ class HwtSchematic_directive_TC(unittest.TestCase):
 
     def test_package(self):
         run_test("test_package")
+    
+    def test_not_a_Unit(self):
+        with self.assertRaises(AssertionError):
+            run_test("test_not_a_Unit")
 
 
 if __name__ == "__main__":
