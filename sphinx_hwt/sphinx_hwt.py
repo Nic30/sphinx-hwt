@@ -5,6 +5,7 @@ from sphinx.addnodes import desc_signature
 from sphinx.locale import _
 from hwt.synthesizer.unit import Unit
 
+
 def generic_import(name):
     components = name.split('.')
     mod = __import__(components[0])
@@ -13,15 +14,16 @@ def generic_import(name):
 
     return mod
 
+
 class SchematicLink(nodes.TextElement):
     SCHEMATIC_VIEWER_URL = "viewer.html"
     SCHEME_FILES_DIR = "_downloads/"
     SCHEME_FILES_EXTENSION = ".json"
-    
+
     @classmethod
     def get_sch_file_name(cls, absolute_name):
         return path.join(cls.SCHEME_FILES_DIR, absolute_name) + cls.SCHEME_FILES_EXTENSION
-    
+
     @classmethod
     def get_sch_link(cls, sch_file_name):
         return "%s&%s" % (cls.SCHEMATIC_VIEWER_URL, sch_file_name)
@@ -43,9 +45,9 @@ class SchematicLink(nodes.TextElement):
             raise AssertionError(
                 "Can not use hwt-schematic sphinx directive and create scheme"
                 " for %s because it is not subclass of %r" % (absolute_name, Unit))
-        
+
         ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri=self.get_sch_link(absolute_name))
+                              refuri=SchematicLink.get_sch_link(absolute_name))
         node += ref
         self.visit_admonition(node)
 
