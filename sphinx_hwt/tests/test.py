@@ -1,3 +1,4 @@
+from docutils.nodes import GenericNodeVisitor
 from io import StringIO
 from os import path
 import os
@@ -16,14 +17,7 @@ pwd = os.path.dirname(path.realpath(__file__))
 sys.path.append(path.join(pwd, ".."))
 
 
-def assert_err_on_exit(err):
-    if err != 0:
-        raise AssertionError("Test exit with %d" % err)
-
-
-# @patch('sys.exit', new=assert_err_on_exit)
-# @patch('sys.stdout', new_callable=StringIO)
-def _run_test(mock_stdout):
+def _run_test():
     rmtree("doc/", ignore_errors=True)
     rmtree("doc_buld/", ignore_errors=True)
 
@@ -33,10 +27,6 @@ def _run_test(mock_stdout):
                        "--output-dir", "doc/", "."])
 
     if ret != 0:
-        sys.stderr.flush()
-        if mock_stdout is not None:
-            sys.stdout.flush()
-
         raise AssertionError("apidoc_main failed with err %d" % ret)
 
     # -b buildername
@@ -52,15 +42,10 @@ def _run_test(mock_stdout):
                        "doc_build/",
                        ])
     if ret != 0:
-        sys.stderr.flush()
-        if mock_stdout is not None:
-            sys.stdout.flush()
         raise AssertionError("sphinx_main failed with err %d" % ret)
 
-    return mock_stdout
 
-
-def run_test(name):
+def run_test(name, mock_stdout=False, mock_stderr=False):
     """
     Build documentation in specified test folder
     """
@@ -69,8 +54,26 @@ def run_test(name):
         # allow test modules import
         sys.path.append(".")
 
-        return _run_test(None)
+        stderr = sys.stderr
+        if mock_stderr:
+            stderr = StringIO()
+
+        stdout = sys.stdout
+        if mock_stdout:
+            stdout = StringIO()
+
+        @patch("sys.stdout", new=stdout)
+        @patch("sys.stderr", new=stderr)
+        def mocked_run_test():
+            return _run_test()
+
+        return mocked_run_test()
     finally:
+        if not mock_stdout:
+            sys.stdout.flush()
+        if not mock_stderr:
+            sys.stderr.flush()
+
         os.chdir(pwd)
         sys.path.pop()
         for name, m in list(sys.modules.items()):
@@ -81,6 +84,12 @@ def run_test(name):
 
 
 class HwtSchematic_directive_TC(unittest.TestCase):
+    def setUp(self):
+        names_to_delete = ["visit_SchematicLink", "depart_SchematicLink"]
+
+        for name in names_to_delete:
+            if hasattr(GenericNodeVisitor, name):
+                delattr(GenericNodeVisitor, name)
 
     def test_another_text(self):
         run_test("test_another_text")
@@ -93,7 +102,7 @@ class HwtSchematic_directive_TC(unittest.TestCase):
 
     def test_not_a_Unit(self):
         with self.assertRaises(AssertionError):
-            run_test("test_not_a_Unit")
+            run_test("test_not_a_Unit", mock_stderr=True)
 
 
 if __name__ == "__main__":

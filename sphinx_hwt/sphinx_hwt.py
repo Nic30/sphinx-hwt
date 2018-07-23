@@ -1,9 +1,15 @@
 from docutils import nodes
 from docutils.parsers.rst import Directive
-from os import path
+from os import path, makedirs
 from sphinx.addnodes import desc_signature
 from sphinx.locale import _
 from hwt.synthesizer.unit import Unit
+from hwtLib.tests.synthesizer.interfaceLevel.subunitsSynthesisTC import synthesised
+from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM,\
+    DEFAULT_LAYOUT_OPTIMIZATIONS
+from hwtGraph.elk.fromHwt.convertor import UnitToLNode
+from hwtGraph.elk.containers.idStore import ElkIdStore
+import json
 
 
 def generic_import(name):
@@ -17,16 +23,19 @@ def generic_import(name):
 
 class SchematicLink(nodes.TextElement):
     SCHEMATIC_VIEWER_URL = "viewer.html"
-    SCHEME_FILES_DIR = "_downloads/"
+    SCHEME_FILES_DIR = "hwt_schematics"  # path relative to static dir
     SCHEME_FILES_EXTENSION = ".json"
 
     @classmethod
-    def get_sch_file_name(cls, absolute_name):
-        return path.join(cls.SCHEME_FILES_DIR, absolute_name) + cls.SCHEME_FILES_EXTENSION
+    def get_sch_file_name_absolute(cls, document, absolute_name):
+        return path.join(document.settings.env.app.builder.outdir,
+                         cls.get_sch_file_name(document, absolute_name))
 
     @classmethod
-    def get_sch_link(cls, sch_file_name):
-        return "%s&%s" % (cls.SCHEMATIC_VIEWER_URL, sch_file_name)
+    def get_sch_file_name(cls, document, absolute_name):
+        static_paths = document.settings.env.config.html_static_path
+        return path.join(static_paths[0], cls.SCHEME_FILES_DIR, absolute_name) \
+            + cls.SCHEME_FILES_EXTENSION
 
     @staticmethod
     def depart_html(self, node):
@@ -34,6 +43,7 @@ class SchematicLink(nodes.TextElement):
 
     @staticmethod
     def visit_html(self, node):
+
         parentClsNode = node.parent.parent
         assert parentClsNode.attributes['objtype'] == 'class'
         assert parentClsNode.attributes['domain'] == 'py'
@@ -46,8 +56,21 @@ class SchematicLink(nodes.TextElement):
                 "Can not use hwt-schematic sphinx directive and create scheme"
                 " for %s because it is not subclass of %r" % (absolute_name, Unit))
 
+        schem_file = SchematicLink.get_sch_file_name_absolute(
+            self.document, absolute_name)
+        makedirs(path.dirname(schem_file), exist_ok=True)
+
+        with open(schem_file, "w") as f:
+            u = unitCls()
+            synthesised(u, DEFAULT_PLATFORM)
+            g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
+            idStore = ElkIdStore()
+            data = g.toElkJson(idStore)
+            json.dump(data, f)
+
         ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri=SchematicLink.get_sch_link(absolute_name))
+                              refuri=SchematicLink.get_sch_file_name(
+                                  self.document, absolute_name))
         node += ref
         self.visit_admonition(node)
 
