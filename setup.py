@@ -8,6 +8,7 @@ def read(filename):
     with open(filename) as fp:
         return fp.read().strip()
 
+
 # javascript dependencies (npm)
 package_json = {
     "dependencies": {
@@ -29,7 +30,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'Sphinx>=1.7.6', # base sphinx doc generator
-        'hwtGraph>=0.1', # converts HWT Units to schemes
+        'hwtGraph>=0.0.1', # converts HWT Units to schemes
     ],
     setup_requires=[
         'calmjs', # allows to import npm packages for visualization
