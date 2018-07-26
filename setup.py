@@ -36,10 +36,10 @@ setup(
         'Programming Language :: Python',
     ],
     entry_points={
-    "setuptools.file_finders": [
-        "foobar = sphinx_hwt._js_install:find_extra_js_files_in_npm"
-    ]},
-
+        "setuptools.file_finders": [
+            "foobar = sphinx_hwt._js_install:find_extra_js_files_in_npm"
+        ]
+    },
     package_data={
         'sphinx_hwt': ['*.html', '*.css', "*.js"]
     },
