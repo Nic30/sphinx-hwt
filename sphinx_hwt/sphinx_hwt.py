@@ -10,6 +10,7 @@ from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM,\
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.containers.idStore import ElkIdStore
 import json
+from shutil import copytree
 
 
 def generic_import(name):
@@ -21,10 +22,11 @@ def generic_import(name):
     return mod
 
 
-class SchematicLink(nodes.TextElement):
-    SCHEMATIC_VIEWER_URL = "viewer.html"
+class SchematicPaths():
+    SCHEMATIC_VIEWER_URL = "schematic_viewer/schematic_viewer.html"
     SCHEME_FILES_DIR = "hwt_schematics"  # path relative to static dir
     SCHEME_FILES_EXTENSION = ".json"
+    SCHEME_VIEWER_SRC_DIR = path.join(path.dirname(__file__), "html")
 
     @classmethod
     def get_sch_file_name_absolute(cls, document, absolute_name):
@@ -32,18 +34,32 @@ class SchematicLink(nodes.TextElement):
                          cls.get_sch_file_name(document, absolute_name))
 
     @classmethod
-    def get_sch_file_name(cls, document, absolute_name):
+    def get_static_path(cls, document):
         static_paths = document.settings.env.config.html_static_path
-        return path.join(static_paths[0], cls.SCHEME_FILES_DIR, absolute_name) \
+        return static_paths[0]
+
+    @classmethod
+    def get_sch_file_name(cls, document, absolute_name):
+        sp = cls.get_static_path(document)
+        return path.join(sp, cls.SCHEME_FILES_DIR, absolute_name) \
             + cls.SCHEME_FILES_EXTENSION
 
-    @staticmethod
-    def depart_html(self, node):
-        self.depart_admonition(node)
+    @classmethod
+    def get_sch_viewer_link(cls, document):
+        return path.join(cls.get_static_path(document),
+                         cls.SCHEMATIC_VIEWER_URL)
+
+    @classmethod
+    def get_sch_viewer_dir(cls, document):
+        return path.join(document.settings.env.app.builder.outdir,
+                         SchematicPaths.get_static_path(document),
+                         "schematic_viewer")
+
+
+class SchematicLink(nodes.TextElement):
 
     @staticmethod
     def visit_html(self, node):
-
         parentClsNode = node.parent.parent
         assert parentClsNode.attributes['objtype'] == 'class'
         assert parentClsNode.attributes['domain'] == 'py'
@@ -56,7 +72,7 @@ class SchematicLink(nodes.TextElement):
                 "Can not use hwt-schematic sphinx directive and create scheme"
                 " for %s because it is not subclass of %r" % (absolute_name, Unit))
 
-        schem_file = SchematicLink.get_sch_file_name_absolute(
+        schem_file = SchematicPaths.get_sch_file_name_absolute(
             self.document, absolute_name)
         makedirs(path.dirname(schem_file), exist_ok=True)
 
@@ -68,11 +84,17 @@ class SchematicLink(nodes.TextElement):
             data = g.toElkJson(idStore)
             json.dump(data, f)
 
+        viewer = SchematicPaths.get_sch_viewer_link(self.document)
+        sch_name = SchematicPaths.get_sch_file_name(
+            self.document, absolute_name)
         ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri=SchematicLink.get_sch_file_name(
-                                  self.document, absolute_name))
+                              refuri="%s?%s" % (viewer, sch_name))
         node += ref
         self.visit_admonition(node)
+
+    @staticmethod
+    def depart_html(self, node):
+        self.depart_admonition(node)
 
 
 class HwtSchematicDirective(Directive):
@@ -81,14 +103,24 @@ class HwtSchematicDirective(Directive):
     has_content = True
     option_spec = {}
 
-    def run(self):
-        env = self.state.document.settings.env
+    def __init__(self, *args, **kwargs):
+        Directive.__init__(self, *args, **kwargs)
+        self._extra_static_files_initialized_for = set()
 
+    def copy_extra_static_files(self):
+        document = self.state.document
+        sp = SchematicPaths.get_static_path(document)
+        if sp not in self._extra_static_files_initialized_for:
+            viewer_dir = SchematicPaths.get_sch_viewer_dir(document)
+            copytree(SchematicPaths.SCHEME_VIEWER_SRC_DIR, viewer_dir)
+            self._extra_static_files_initialized_for.add(sp)
+
+    def run(self):
         # build dir path
         # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
         # targetid = "hwt-schematic-%d" % env.new_serialno('hwt-schematic')
         # targetnode = nodes.target('', '', ids=[targetid])
-
+        self.copy_extra_static_files()
         schema_node = SchematicLink()
         # schema_node += nodes.title(_('Schematic'), _('Todo'))
         self.state.nested_parse(self.content,
