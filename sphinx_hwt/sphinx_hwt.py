@@ -10,7 +10,7 @@ from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM,\
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.containers.idStore import ElkIdStore
 import json
-from shutil import copytree
+from shutil import copytree, rmtree
 
 
 def generic_import(name):
@@ -112,6 +112,9 @@ class HwtSchematicDirective(Directive):
         sp = SchematicPaths.get_static_path(document)
         if sp not in self._extra_static_files_initialized_for:
             viewer_dir = SchematicPaths.get_sch_viewer_dir(document)
+            if path.exists(viewer_dir):
+                rmtree(viewer_dir)
+
             copytree(SchematicPaths.SCHEME_VIEWER_SRC_DIR, viewer_dir)
             self._extra_static_files_initialized_for.add(sp)
 
