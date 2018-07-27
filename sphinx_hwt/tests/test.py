@@ -11,10 +11,10 @@ import unittest
 from unittest.mock import patch
 
 
-pwd = os.path.dirname(path.realpath(__file__))
+cwd = os.path.dirname(path.realpath(__file__))
 
 # allow to use this extension
-sys.path.append(path.join(pwd, ".."))
+sys.path.append(path.join(cwd, ".."))
 
 
 def _run_test():
@@ -37,7 +37,7 @@ def _run_test():
 
     # sphinx_main(["-h"])
     ret = sphinx_main(["-b", "html", "-E",
-                       "-c", pwd,
+                       "-c", cwd,
                        "doc/",
                        "doc_build/",
                        ])
@@ -45,12 +45,13 @@ def _run_test():
         raise AssertionError("sphinx_main failed with err %d" % ret)
 
 
-def run_test(name, mock_stdout=False, mock_stderr=False):
+def run_test(test_name, mock_stdout=False, mock_stderr=False):
     """
     Build documentation in specified test folder
     """
+    test_path = path.join(cwd, test_name)
     try:
-        os.chdir(name)
+        os.chdir(test_path)
         # allow test modules import
         sys.path.append(".")
 
@@ -74,7 +75,7 @@ def run_test(name, mock_stdout=False, mock_stderr=False):
         if not mock_stderr:
             sys.stderr.flush()
 
-        os.chdir(pwd)
+        os.chdir(cwd)
         sys.path.pop()
         for name, m in list(sys.modules.items()):
             if isinstance(m, ModuleType) \
