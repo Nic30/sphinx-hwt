@@ -1,16 +1,26 @@
 from docutils import nodes
 from docutils.parsers.rst import Directive
+import json
 from os import path, makedirs
+from shutil import copytree, rmtree
 from sphinx.addnodes import desc_signature
 from sphinx.locale import _
+
+from hwt.synthesizer.dummyPlatform import DummyPlatform
 from hwt.synthesizer.unit import Unit
-from hwtLib.tests.synthesizer.interfaceLevel.subunitsSynthesisTC import synthesised
-from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM,\
-    DEFAULT_LAYOUT_OPTIMIZATIONS
-from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.containers.idStore import ElkIdStore
-import json
-from shutil import copytree, rmtree
+from hwtGraph.elk.fromHwt.convertor import UnitToLNode
+from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
+    DEFAULT_LAYOUT_OPTIMIZATIONS
+
+
+def synthesised(u: Unit, targetPlatform=DummyPlatform()):
+    assert not u._wasSynthetised()
+    u._loadDeclarations()
+
+    for _ in u._toRtl(targetPlatform):
+        pass
+    return u
 
 
 def generic_import(name):
@@ -42,7 +52,7 @@ class SchematicPaths():
     def get_sch_file_name(cls, document, absolute_name):
         sp = cls.get_static_path(document)
         return path.join(sp, cls.SCHEME_FILES_DIR, absolute_name) \
-            + cls.SCHEME_FILES_EXTENSION
+            +cls.SCHEME_FILES_EXTENSION
 
     @classmethod
     def get_sch_viewer_link(cls, document):
