@@ -23,8 +23,8 @@ setup(
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     install_requires=[
-        'Sphinx>=1.7.6',  # base sphinx doc generator
-        'hwtGraph>=0.4',  # converts HWT Units to schemes
+        'sphinx>=1.7.6',  # base sphinx doc generator
+        'hwtGraph>=0.4',  # converts HWT Units to schematics
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -37,7 +37,7 @@ setup(
     ],
     entry_points={
         "setuptools.file_finders": [
-            "foobar = sphinx_hwt._js_install:find_extra_js_files_in_npm"
+            "sphinx_hwt = sphinx_hwt._js_install:find_extra_js_files_in_npm"
         ]
     },
     package_data={
