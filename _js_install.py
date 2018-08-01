@@ -39,7 +39,6 @@ def find_extra_js_files_in_npm():
     Download npm packages required by package.json and extract required
     files from them
     """
-    print("find_extra_js_files_in_npm")
     if not os.path.exists(os.path.join(TOP_DIR, "node_modules")):
         npm_installation_check()
         run_npm_install()
