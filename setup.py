@@ -11,9 +11,12 @@ import sys
 
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 
-sys.path.insert(0, dirname(__file__))
-from _js_install import find_extra_js_files_in_npm
-
+try:
+    from _js_install import find_extra_js_files_in_npm
+except ImportError:
+    sys.path.append(dirname(__file__))
+    from _js_install import find_extra_js_files_in_npm
+    sys.path.pop()
 
 
 # from setuptools.command.install import install
