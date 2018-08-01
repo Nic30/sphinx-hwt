@@ -3,14 +3,17 @@
 
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
-from macpath import dirname
 from os import path
+from os.path import dirname
 from setuptools import find_packages, setup, Command
 from shutil import rmtree
+import sys
 
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 
+sys.path.insert(0, dirname(__file__))
 from _js_install import find_extra_js_files_in_npm
+
 
 
 # from setuptools.command.install import install
@@ -57,7 +60,7 @@ class clean(_clean):
         
 setup(
     name='sphinx-hwt',
-    version='0.1',
+    version='0.2',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
     description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
