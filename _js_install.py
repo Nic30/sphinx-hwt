@@ -34,20 +34,20 @@ def run_npm_install():
         os.chdir(origCwd)
 
 
-def find_extra_js_files_in_npm(dirname):
+def find_extra_js_files_in_npm():
     """
     Download npm packages required by package.json and extract required
     files from them
     """
-    if dirname == "":
-        if not os.path.exists(os.path.join(TOP_DIR, "node_modules")):
-            npm_installation_check()
-            run_npm_install()
+    print("find_extra_js_files_in_npm")
+    if not os.path.exists(os.path.join(TOP_DIR, "node_modules")):
+        npm_installation_check()
+        run_npm_install()
 
-        for js in JS_FILES:
-            downloaded_js_name = os.path.join(TOP_DIR, js)
-            assert os.path.exists(downloaded_js_name), downloaded_js_name
-            installed_js_name = os.path.join("sphinx_hwt", "html", js)
-            os.makedirs(os.path.dirname(installed_js_name), exist_ok=True)
-            copyfile(downloaded_js_name, installed_js_name)
-            yield installed_js_name  
+    for js in JS_FILES:
+        downloaded_js_name = os.path.join(TOP_DIR, js)
+        assert os.path.exists(downloaded_js_name), downloaded_js_name
+        installed_js_name = os.path.join("sphinx_hwt", "html", js)
+        os.makedirs(os.path.dirname(installed_js_name), exist_ok=True)
+        copyfile(downloaded_js_name, installed_js_name)
+        yield installed_js_name  

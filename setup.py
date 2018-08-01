@@ -1,15 +1,60 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# from distutils.command.install_data import install_data
-from setuptools import find_packages, setup
+from distutils.command.build import build as _build
+from distutils.command.clean import clean as _clean
+from macpath import dirname
+from os import path
+from setuptools import find_packages, setup, Command
+from shutil import rmtree
+
+from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
+
+from _js_install import find_extra_js_files_in_npm
 
 
+# from setuptools.command.install import install
 def read(filename):
     with open(filename) as fp:
         return fp.read().strip()
 
 
+class bdist_egg(_bdist_egg):
+
+    def run(self):
+        self.run_command('build_npm')
+        _bdist_egg.run(self)
+
+
+class build_npm(Command):
+    description = 'build javascript and CSS from NPM packages'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        for f in find_extra_js_files_in_npm():
+            print("copy generated from NPM packages", f)
+
+
+class build(_build):
+    sub_commands = _build.sub_commands + [('build_npm', None)]
+
+
+class clean(_clean):
+
+    def run(self):
+        root = dirname(__file__)
+        for d in ["node_modules", "sphinx_hwt/html/node_modules"]:
+            rmtree(path.join(root, d), ignore_errors=True)
+
+        _clean.run(self)
+
+        
 setup(
     name='sphinx-hwt',
     version='0.1',
@@ -35,10 +80,11 @@ setup(
         'Natural Language :: English',
         'Programming Language :: Python',
     ],
-    entry_points={
-        "setuptools.file_finders": [
-            "sphinx_hwt = sphinx_hwt._js_install:find_extra_js_files_in_npm"
-        ]
+    cmdclass={
+        'build': build,
+        'bdist_egg': bdist_egg,
+        'build_npm': build_npm,
+        'clean': clean,
     },
     package_data={
         'sphinx_hwt': ['*.html', '*.css', "*.js"]
