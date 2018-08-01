@@ -34,9 +34,9 @@ def generic_import(name):
 
 class SchematicPaths():
     SCHEMATIC_VIEWER_URL = "schematic_viewer/schematic_viewer.html"
-    SCHEME_FILES_DIR = "hwt_schematics"  # path relative to static dir
-    SCHEME_FILES_EXTENSION = ".json"
-    SCHEME_VIEWER_SRC_DIR = path.join(path.dirname(__file__), "html")
+    SCHEMATIC_FILES_DIR = "hwt_schematics"  # path relative to static dir
+    SCHEMATIC_FILES_EXTENSION = ".json"
+    SCHEMATIC_VIEWER_SRC_DIR = path.join(path.dirname(__file__), "html")
 
     @classmethod
     def get_sch_file_name_absolute(cls, document, absolute_name):
@@ -51,8 +51,8 @@ class SchematicPaths():
     @classmethod
     def get_sch_file_name(cls, document, absolute_name):
         sp = cls.get_static_path(document)
-        return path.join(sp, cls.SCHEME_FILES_DIR, absolute_name) \
-            +cls.SCHEME_FILES_EXTENSION
+        return path.join(sp, cls.SCHEMATIC_FILES_DIR, absolute_name) \
+            +cls.SCHEMATIC_FILES_EXTENSION
 
     @classmethod
     def get_sch_viewer_link(cls, document):
@@ -79,7 +79,7 @@ class SchematicLink(nodes.TextElement):
         unitCls = generic_import(absolute_name)
         if not issubclass(unitCls, Unit):
             raise AssertionError(
-                "Can not use hwt-schematic sphinx directive and create scheme"
+                "Can not use hwt-schematic sphinx directive and create schematic"
                 " for %s because it is not subclass of %r" % (absolute_name, Unit))
 
         schem_file = SchematicPaths.get_sch_file_name_absolute(
@@ -126,7 +126,7 @@ class HwtSchematicDirective(Directive):
             if path.exists(viewer_dir):
                 rmtree(viewer_dir)
 
-            copytree(SchematicPaths.SCHEME_VIEWER_SRC_DIR, viewer_dir)
+            copytree(SchematicPaths.SCHEMATIC_VIEWER_SRC_DIR, viewer_dir)
             self._extra_static_files_initialized_for.add(sp)
 
     def run(self):
