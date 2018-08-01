@@ -53,14 +53,17 @@
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        var schematic_url = getParameterByName("schatic");
+        var schematic_url = getParameterByName("schematic");
         if (schematic_url == null)
         	throw Error("schematic url was not specified");
 
-        d3.json(schematic_url, function(error, data) {
-            // load the data and render the elements
-            g.bindData(graph);
-        });
+        d3.json(schematic_url)
+          .then(function(graph) {
+        	  if (graph.name)
+        		  document.title = graph.name;
+              // load the data and render the elements
+              g.bindData(graph);
+           });
     </script>
 </body>
 </html>
