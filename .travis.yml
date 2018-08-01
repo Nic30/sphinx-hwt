@@ -2,38 +2,32 @@ dist: trusty
 language: python
 git:
   depth: 1
-
 cache:
   apt: true
-
 python:
-  - '3.6'
-
+- '3.6'
 install:
-  - pip install pytest coveralls
-  - cd ..
-  - git clone --depth=1 https://github.com/Nic30/hwt.git
-  - cd hwt
-  - python setup.py install
-  - cd ..
-  - git clone --depth=1 https://github.com/Nic30/hwtGraph.git
-  - cd hwtGraph
-  - python setup.py install
-  - cd ../sphinx-hwt
-  - python setup.py install
-  - rm -r node_modules
-
+- pip install pytest coveralls
+- cd ..
+- git clone --depth=1 https://github.com/Nic30/hwt.git
+- cd hwt
+- python setup.py install
+- cd ..
+- git clone --depth=1 https://github.com/Nic30/hwtGraph.git
+- cd hwtGraph
+- python setup.py install
+- cd ../sphinx-hwt
+- python setup.py install
+- rm -r node_modules
 script:
-  - coverage run --source=sphinx_hwt setup.py test
-
+- coverage run --source=sphinx_hwt setup.py test
 deploy:
   provider: pypi
   user: nic30
   password:
-    secure: 0IuZBgghn7IEVO6sF3xST+KOcmmYxS1FfT48ljkKq1QnZX+TkhuAuLXpz7XbHAuKUkCMyEbPz65IaTTVompxALM90eRcT3uxfMK3pUDTWUrtJ+lrkabNlU9E2S1rE47fMgrRYbmSEAX+dUimFOp5xJ3khC/yLb6nPMJ7OKgWybDYev3d2oLrzHWyviUg/Yz0RJcV9mM4yOsA9+JYB8xW7CGqSJeZUxNGlwy8PaxYHl0LW0GEwNCU3lXdXY3scLuZmNiVZhdbPWhlvnNHPgiHwkTYM6R109CuzJZkKDvp+8VDrQy92cab2+44eIpxvfNwvm39qKkfP8HUMp7SNUb6nANpGv0C7kLw2J37IeUA+rLRqgofcU4Mn/soxfdLRfB3SkQdTmAVzjEi+yjxrdYnHYQe7/7Ql0bEWKbLNyW4l2b1BQtTI5y8g9OlqKZvrywhpY+vl3y2vPHHDd81pzQQDzqQMf/3dd0gSmg4Fa3WblUssVHaLsZ26zVLd7PzTj2i3m8ppwOfWuM4eChO2rV99759hWavPJ2hIewCTY/LGvuwjZ9PR7uhP+Bg3kH8rvEnf1gQuRNO+p+0WpML0MmVtsZytC64VivGBM/UdNEn5UwhAsdgW8ijc2OJCGbhUOCI4+ebrbx+irD2BuT+AmkC4c66cmC9bksFJeMyoWix3No=
+    secure: k+J+xbOp4n4DiRy3Th7JaNZGdHz9d5nCxJnynnujabXQM9pD9V8eAqVdiuG0gzonSr4u0CLz/3oHrjOE9M7K/BzQUyTERKecMH8A1OQ5gx3zBIevZjYoEeo8We9cn97NqeKXLIY7Co5qDV/GEkyp+bXS5NgUHFb3wZGThVgoAA/zEbinKIIA/aNaUDgUrOHDkEVgIYd10j4mNyuxyWL2zbMxGDpUh9uurbmiESWlJ4JDAcRA054BjpXPnOYawzcQHFJEdIqPni0TyV8RR7T0BVqhJH5CQHXriAei1AQmObSFOfNOa3FJnJdtG7vm5P5KZDWI++7o+j+Z0WN717mbhEaCBcpqwnQP3gQuQZo5Pdth3N1xJ5QOgoAkbQCvhRvCrjo6wxSDvgylPJaStTVobFw7ttWLe4vI1c95pnWE49B1VOxG/ddZL4HTc+wujBDIqAR+onbMcfZsrvQTVMlkDhRbhcvVmfO58vlT9ISZfHENlm7vj7ytf0Ak51HXo5WWZCbv1/cYP4m2Gcx9cUr+TdrFRLT2raU5RHtKyVvSvLwSWt0V6TeEvMOZeW6U9H68js/fpsFYALRc1Y0gmA9MdRmpSA8OHCukCIdERP0P8ptVCrNNvrr8xylf5ce3jUMt5HInSZwIvuEY2fR0f1pstXpNuuLRz/K115CYAuJ7DaI=
   on:
     tags: true
     branch: master
-
 after_success:
 - coveralls
