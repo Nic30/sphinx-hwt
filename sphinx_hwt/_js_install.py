@@ -1,5 +1,5 @@
 import os
-from subprocess import check_call, CalledProcessError
+from subprocess import check_call
 import sys
 from shutil import copyfile
 
@@ -14,7 +14,7 @@ JS_FILES = [
 def npm_installation_check():
     try:
         check_call(["npm", "--version"])
-    except CalledProcessError:
+    except Exception:
         print("Can not find npm, which is required for the installation", file=sys.stderr)
         sys.exit(1)
 
@@ -24,7 +24,8 @@ def run_npm_install():
     # PYTHONPATH has to be removed because webworker-threads (d3-hwschematic -> elk -> )
     # has install time dependency on python2 and PYTHONPATH 
     # overrideds python2 import paths
-    del my_env["PYTHONPATH"]
+    if "PYTHONPATH" in my_env:
+        del my_env["PYTHONPATH"]
     origCwd = os.getcwd()
     try:
         os.chdir(TOP_DIR)
