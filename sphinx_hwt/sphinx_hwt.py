@@ -98,7 +98,8 @@ class SchematicLink(nodes.TextElement):
         sch_name = SchematicPaths.get_sch_file_name(
             self.document, absolute_name)
         ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri="%s?%s" % (viewer, sch_name))
+                              refuri="/%s?schematic=/%s" % (viewer,
+                                                           sch_name))
         node += ref
         self.visit_admonition(node)
 
