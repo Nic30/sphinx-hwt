@@ -3,17 +3,16 @@
 
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
+from distutils.command.sdist import sdist as _sdist
 from os import path
 import os
 from os.path import dirname, abspath
 from setuptools import find_packages, setup, Command
+from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from shutil import copyfile
 from shutil import rmtree
 from subprocess import check_call
 import sys
-
-from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
-from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
 
 TOP_DIR = dirname(abspath(__file__))
@@ -28,8 +27,8 @@ def npm_installation_check():
     try:
         check_call(["npm", "--version"])
     except Exception:
-        print("Can not find npm, which is required for the installation", file=sys.stderr)
-        sys.exit(1)
+        return False
+    return True
 
 
 def run_npm_install():
@@ -48,23 +47,6 @@ def run_npm_install():
         os.chdir(origCwd)
 
 
-def find_extra_js_files_in_npm():
-    """
-    Download npm packages required by package.json and extract required
-    files from them
-    """
-    #if not os.path.exists(os.path.join(TOP_DIR, "node_modules")):
-    run_npm_install()
-
-    for js in JS_FILES:
-        downloaded_js_name = os.path.join(TOP_DIR, js)
-        assert os.path.exists(downloaded_js_name), downloaded_js_name
-        installed_js_name = os.path.join(TOP_DIR, "sphinx_hwt", "html", js)
-        os.makedirs(os.path.dirname(installed_js_name), exist_ok=True)
-        copyfile(downloaded_js_name, installed_js_name)
-        yield installed_js_name  
-
-
 # from setuptools.command.install import install
 def read(filename):
     with open(filename) as fp:
@@ -77,11 +59,12 @@ class bdist_egg(_bdist_egg):
         self.run_command('build_npm')
         _bdist_egg.run(self)
 
-class bdist_wheel(_bdist_wheel):
+
+class sdist_with_npm(_sdist):
 
     def run(self):
         self.run_command('build_npm')
-        _bdist_wheel.run(self)
+        _sdist.run(self)
 
 
 class build_npm(Command):
@@ -95,9 +78,31 @@ class build_npm(Command):
         pass
 
     def run(self):
-        for f in find_extra_js_files_in_npm():
-            print("copy generated from NPM packages", f)
-
+        has_npm = npm_installation_check()
+        if has_npm:
+            run_npm_install()
+        else:
+            print("Warning: npm not installed using prebuilded js files!", file=sys.stderr)
+        """
+        Download npm packages required by package.json and extract required
+        files from them
+        """
+        for js in JS_FILES:
+            downloaded_js_name = os.path.join(TOP_DIR, js)
+            installed_js_name = os.path.join(TOP_DIR, "sphinx_hwt", "html", js)
+            if has_npm:
+                assert os.path.exists(downloaded_js_name), downloaded_js_name
+                os.makedirs(os.path.dirname(installed_js_name), exist_ok=True)
+                copyfile(downloaded_js_name, installed_js_name)
+                print("copy generated from NPM packages", installed_js_name)
+            else:
+                if os.path.exists(installed_js_name):
+                    print("using prebuilded", installed_js_name)
+                else:
+                    raise  Exception("Can not find npm,"
+                                     " which is required for the installation "
+                                     "and this is pacpage has not js prebuilded")
+            
 
 class build(_build):
     sub_commands = _build.sub_commands + [('build_npm', None)]
@@ -113,7 +118,6 @@ class clean(_clean):
         _clean.run(self)
 
 
-npm_installation_check()
 setup(
     name='sphinx-hwt',
     version='0.6',
@@ -148,10 +152,10 @@ setup(
         "Topic :: Utilities",
     ],
     cmdclass={
-        'build': build,
+        'build': build,  # clean generated files
         'bdist_egg': bdist_egg,
-        'build_npm': build_npm,
-        'bdist_wheel': bdist_wheel,
+        'build_npm': build_npm,  # generate js files from npm packages
+        'sdist': sdist_with_npm,
         'clean': clean,
     },
     package_data={
