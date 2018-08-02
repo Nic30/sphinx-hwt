@@ -116,7 +116,7 @@ class clean(_clean):
         
 setup(
     name='sphinx-hwt',
-    version='0.4',
+    version='0.5',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
     description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
