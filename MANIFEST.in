@@ -1,1 +1,2 @@
 recursive-include sphinx_hwt/html/ *.html *.css *.js
+_js_install.py
