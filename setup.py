@@ -105,7 +105,7 @@ class build_npm(Command):
             
 
 class build(_build):
-    sub_commands = _build.sub_commands + [('build_npm', None)]
+    sub_commands =  [('build_npm', None)] + _build.sub_commands
 
 
 class clean(_clean):
