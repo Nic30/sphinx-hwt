@@ -5,7 +5,7 @@ from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
 from os import path
 import os
-from os.path import dirname
+from os.path import dirname, abspath
 from setuptools import find_packages, setup, Command
 from shutil import copyfile
 from shutil import rmtree
@@ -16,7 +16,7 @@ from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
 
-TOP_DIR = dirname(__file__)
+TOP_DIR = dirname(abspath(__file__))
 
 JS_FILES = [
     "node_modules/d3/dist/d3.js",
@@ -41,6 +41,7 @@ def run_npm_install():
         del my_env["PYTHONPATH"]
     origCwd = os.getcwd()
     try:
+        print("installing npm packages in ", TOP_DIR)
         os.chdir(TOP_DIR)
         check_call(["npm", "install"], env=my_env)
     finally:
