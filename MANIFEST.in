@@ -1,3 +1,10 @@
-recursive-include sphinx_hwt/html/ *.html *.css *.js
+#recursive-include sphinx_hwt/html *.html *.css *.js
+include sphinx_hwt/html/node_modules/d3-hwschematic/src/elk/elk-worker.js
+include sphinx_hwt/html/node_modules/d3-hwschematic/dist/d3-hwschematic.js
+include sphinx_hwt/html/node_modules/d3/dist/d3.js
+include sphinx_hwt/html/schematic_viewer.css
+include sphinx_hwt/html/schematic_viewer.html
+
+include MANIFEST.in
 include package.json
 include README.md
