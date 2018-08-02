@@ -16,7 +16,7 @@ from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
 
-TOP_DIR = os.getcwd()
+TOP_DIR = dirname(__file__)
 
 JS_FILES = [
     "node_modules/d3/dist/d3.js",
