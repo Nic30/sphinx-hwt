@@ -1,2 +1,2 @@
 recursive-include sphinx_hwt/html/ *.html *.css *.js
-package.json
+include package.json

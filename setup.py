@@ -54,7 +54,6 @@ def find_extra_js_files_in_npm():
     files from them
     """
     #if not os.path.exists(os.path.join(TOP_DIR, "node_modules")):
-    npm_installation_check()
     run_npm_install()
 
     for js in JS_FILES:
@@ -113,7 +112,8 @@ class clean(_clean):
 
         _clean.run(self)
 
-        
+
+npm_installation_check()
 setup(
     name='sphinx-hwt',
     version='0.5',
