@@ -13,6 +13,8 @@ from subprocess import check_call
 import sys
 
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
 
 TOP_DIR = os.getcwd()
 
@@ -74,6 +76,12 @@ class bdist_egg(_bdist_egg):
     def run(self):
         self.run_command('build_npm')
         _bdist_egg.run(self)
+
+class bdist_wheel(_bdist_wheel):
+
+    def run(self):
+        self.run_command('build_npm')
+        _bdist_wheel.run(self)
 
 
 class build_npm(Command):
@@ -142,6 +150,7 @@ setup(
         'build': build,
         'bdist_egg': bdist_egg,
         'build_npm': build_npm,
+        'bdist_wheel': bdist_wheel,
         'clean': clean,
     },
     package_data={
