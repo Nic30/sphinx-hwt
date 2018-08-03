@@ -34,6 +34,7 @@ def generic_import(name):
 
 class SchematicPaths():
     SCHEMATIC_VIEWER_URL = "schematic_viewer/schematic_viewer.html"
+    SCHEMATIC_DIR_PREFIX = "../../"  # relative path from SCHEMATIC_VIEWER_URL
     SCHEMATIC_FILES_DIR = "hwt_schematics"  # path relative to static dir
     SCHEMATIC_FILES_EXTENSION = ".json"
     SCHEMATIC_VIEWER_SRC_DIR = path.join(path.dirname(__file__), "html")
@@ -98,8 +99,10 @@ class SchematicLink(nodes.TextElement):
         sch_name = SchematicPaths.get_sch_file_name(
             self.document, absolute_name)
         ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri="/%s?schematic=/%s" % (viewer,
-                                                           sch_name))
+                              refuri="%s?schematic=%s" % (
+                                  viewer,
+                                  path.join(SchematicPaths.SCHEMATIC_DIR_PREFIX,
+                                            sch_name)))
         node += ref
         self.visit_admonition(node)
 

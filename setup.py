@@ -105,7 +105,7 @@ class build_npm(Command):
             
 
 class build(_build):
-    sub_commands = _build.sub_commands + [('build_npm', None)]
+    sub_commands =  [('build_npm', None)] + _build.sub_commands
 
 
 class clean(_clean):
@@ -120,7 +120,7 @@ class clean(_clean):
 
 setup(
     name='sphinx-hwt',
-    version='0.7',
+    version='0.9',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
     description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
