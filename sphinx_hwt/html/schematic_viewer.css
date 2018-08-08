@@ -9,6 +9,20 @@ text {
   /*.attr("fill", "url(#blue_grad)")*/
 }
 
+.node-operator {
+  stroke: BLACK;
+  stroke-width: 1px;
+  fill: #e6ffff;
+  border: 2px;
+}
+.node-operator text {
+  font-style:normal;
+  font-family: monospace;
+  /*font-family:Verdana; 
+  font-size:55; */
+  fill: black;
+}
+
 .link {
   stroke: #000;
   stroke-opacity: .6;

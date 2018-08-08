@@ -26,21 +26,23 @@
         var width = viewport().width,
             height = viewport().height;
         
-        var zoom = d3.zoom()
-            .on("zoom", applyTransform);
-        
         var svg = d3.select("#scheme-placeholder")
-            .attr("width", width)
-            .attr("height", height)
-            .call(zoom)
-            .on("dblclick.zoom", null) // disable zoom on doubleclick
-            .append("g");
-        
+        .attr("width", width)
+        .attr("height", height)
+        //.append("g");
+
+        var zoom = d3.zoom();
+        zoom.on("zoom", function applyTransform() {
+            g.root.attr("transform", d3.event.transform)
+        });
+
+        // disable zoom on doubleclick 
+        // because it interferes with component expanding/collapsing
+        svg.call(zoom)
+        .on("dblclick.zoom", null)
+
         var g = new d3.HwSchematic(svg);
-        
-        function applyTransform() {
-          svg.attr("transform", d3.event.transform)
-        };
+
     </script>
     <script>
         function getParameterByName(name, url) {
