@@ -6,7 +6,7 @@
 Extension for Sphinx document generator. Add automatically generated schemes and other visual documentation of hardware.
 Currently mainly for [HWT library](https://github.com/Nic30/hwt.git) (but VHDL,Verilog -> HWT is possible).
 
-Live demo is documentation of [hwtLib library](https://github.com/Nic30/hwtLib), this library contains many components. Schematic is for example in documentation of [CRC generator](http://hwtlib.readthedocs.io/en/latest/_static/schematic_viewer/schematic_viewer.html?schematic=../../_static/hwt_schematics/hwtLib.logic.crc.Crc.json).
+Live demo is documentation of [hwtLib library](https://github.com/Nic30/hwtLib), this library contains many components. The schematic is in documentation of compoents for example there in documentation of [CRC generator](http://hwtlib.readthedocs.io/en/latest/_static/schematic_viewer/schematic_viewer.html?schematic=../../_static/hwt_schematics/hwtLib.logic.crc.Crc.json).
 
 
 ## Installation
