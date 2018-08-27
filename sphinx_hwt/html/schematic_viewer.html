@@ -31,6 +31,16 @@
           .attr("height", height)
         //.append("g");
 
+        var orig = document.body.onresize;
+        document.body.onresize = function(ev) {
+            if (orig)
+        	    orig(ev);
+
+            var w = viewport();
+            svg.attr("width", w.width);
+			svg.attr("height", w.height);
+        }
+
         var zoom = d3.zoom();
         zoom.on("zoom", function applyTransform() {
             g.root.attr("transform", d3.event.transform)
