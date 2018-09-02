@@ -10,7 +10,7 @@ class ExampleCls0(Unit):
 
     def _declr(self):
         self.din = Signal()
-        self.dout = Signal()
+        self.dout = Signal()._m()
 
     def _impl(self):
         self.dout(self.din)

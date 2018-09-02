@@ -1,14 +1,15 @@
-from docutils.nodes import GenericNodeVisitor
 from io import StringIO
 from os import path
 import os
 from shutil import rmtree
-from sphinx.cmdline import main as sphinx_main
-from sphinx.ext.apidoc import main as apidoc_main
 import sys
 from types import ModuleType
 import unittest
 from unittest.mock import patch
+
+from docutils.nodes import GenericNodeVisitor
+from sphinx.cmdline import main as sphinx_main
+from sphinx.ext.apidoc import main as apidoc_main
 
 
 cwd = os.path.dirname(path.realpath(__file__))

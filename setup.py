@@ -112,7 +112,7 @@ class clean(_clean):
 
     def run(self):
         root = dirname(__file__)
-        for d in ["node_modules", "sphinx_hwt/html/node_modules"]:
+        for d in ["node_modules", "sphinx_hwt/html/node_modules", "sphinx_hwt.egg-info", "dist", "build"]:
             rmtree(path.join(root, d), ignore_errors=True)
 
         _clean.run(self)
@@ -132,7 +132,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'sphinx>=1.7.6',  # base sphinx doc generator
-        'hwtGraph>=0.4',  # converts HWT Units to schematics
+        'hwtGraph>=0.5',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
