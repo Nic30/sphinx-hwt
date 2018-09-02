@@ -27,9 +27,9 @@
             height = viewport().height;
         
         var svg = d3.select("#scheme-placeholder")
-	        .attr("width", width)
-	        .attr("height", height);
-        
+          .attr("width", width)
+          .attr("height", height);
+
         var orig = document.body.onresize;
         document.body.onresize = function(ev) {
             if (orig)
