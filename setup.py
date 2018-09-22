@@ -7,12 +7,13 @@ from distutils.command.sdist import sdist as _sdist
 from os import path
 import os
 from os.path import dirname, abspath
-from setuptools import find_packages, setup, Command
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from shutil import copyfile
 from shutil import rmtree
 from subprocess import check_call
 import sys
+
+from setuptools import find_packages, setup, Command
 
 
 TOP_DIR = dirname(abspath(__file__))
@@ -82,7 +83,8 @@ class build_npm(Command):
         if has_npm:
             run_npm_install()
         else:
-            print("Warning: npm not installed using prebuilded js files!", file=sys.stderr)
+            print("Warning: npm not installed using prebuilded js files!",
+                  file=sys.stderr)
         """
         Download npm packages required by package.json and extract required
         files from them
@@ -99,20 +101,21 @@ class build_npm(Command):
                 if os.path.exists(installed_js_name):
                     print("using prebuilded", installed_js_name)
                 else:
-                    raise  Exception("Can not find npm,"
-                                     " which is required for the installation "
-                                     "and this is pacpage has not js prebuilded")
-            
+                    raise Exception("Can not find npm,"
+                                    " which is required for the installation "
+                                    "and this is pacpage has not js prebuilded")
+
 
 class build(_build):
-    sub_commands =  [('build_npm', None)] + _build.sub_commands
+    sub_commands = [('build_npm', None)] + _build.sub_commands
 
 
 class clean(_clean):
 
     def run(self):
         root = dirname(__file__)
-        for d in ["node_modules", "sphinx_hwt/html/node_modules", "sphinx_hwt.egg-info", "dist", "build"]:
+        for d in ["node_modules", "sphinx_hwt/html/node_modules",
+                  "sphinx_hwt.egg-info", "dist", "build"]:
             rmtree(path.join(root, d), ignore_errors=True)
 
         _clean.run(self)
@@ -132,7 +135,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'sphinx>=1.7.6',  # base sphinx doc generator
-        'hwtGraph>=0.5',  # converts HWT Units to schematics
+        'hwtGraph>=0.7',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
