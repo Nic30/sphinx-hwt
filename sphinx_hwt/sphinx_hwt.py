@@ -12,6 +12,7 @@ from hwtGraph.elk.containers.idStore import ElkIdStore
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
+from typing import Optional
 
 
 def synthesised(u: Unit, targetPlatform=DummyPlatform()):
@@ -24,7 +25,12 @@ def synthesised(u: Unit, targetPlatform=DummyPlatform()):
 
 
 def generic_import(name):
-    components = name.split('.')
+    if isinstance(name, str):
+        components = name.split('.')
+    else:
+        assert isinstance(name, list), name
+        components = name
+
     mod = __import__(components[0])
     for comp in components[1:]:
         mod = getattr(mod, comp)
@@ -53,7 +59,7 @@ class SchematicPaths():
     def get_sch_file_name(cls, document, absolute_name):
         sp = cls.get_static_path(document)
         return path.join(sp, cls.SCHEMATIC_FILES_DIR, absolute_name) \
-            +cls.SCHEMATIC_FILES_EXTENSION
+            + cls.SCHEMATIC_FILES_EXTENSION
 
     @classmethod
     def get_sch_viewer_link(cls, document):
@@ -69,6 +75,13 @@ class SchematicPaths():
 
 class SchematicLink(nodes.TextElement):
 
+    def __init__(self, constructor_fn: Optional[str]=None, *args, **kwargs):
+        """
+        :param constructor_fn: optional name of explicit constructor function
+        """
+        super(SchematicLink, self).__init__(*args, **kwargs)
+        self._constructor_fn = constructor_fn
+
     @staticmethod
     def visit_html(self, node):
         parentClsNode = node.parent.parent
@@ -77,18 +90,29 @@ class SchematicLink(nodes.TextElement):
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
         absolute_name = sign.attributes['ids'][0]
-        unitCls = generic_import(absolute_name)
-        if not issubclass(unitCls, Unit):
-            raise AssertionError(
-                "Can not use hwt-schematic sphinx directive and create schematic"
-                " for %s because it is not subclass of %r" % (absolute_name, Unit))
+        if node._constructor_fn is None:
+            unitCls = generic_import(absolute_name)
+            if not issubclass(unitCls, Unit):
+                raise AssertionError(
+                    "Can not use hwt-schematic sphinx directive and create schematic"
+                    " for %s because it is not subclass of %r" % (absolute_name, Unit))
+            u = unitCls()
+        else:
+            _absolute_name = absolute_name.split(sep=".")[:1]
+            _absolute_name.append(node._constructor_fn)
+            constructor_fn = generic_import(_absolute_name)
+            u = constructor_fn()
+            if not isinstance(u, Unit):
+                raise AssertionError(
+                    "Can not use hwt-schematic sphinx directive and create schematic"
+                    " for %s because function did not returned instance of %r, (%r)" % (
+                        _absolute_name, Unit, u))
 
         schem_file = SchematicPaths.get_sch_file_name_absolute(
             self.document, absolute_name)
         makedirs(path.dirname(schem_file), exist_ok=True)
 
         with open(schem_file, "w") as f:
-            u = unitCls()
             synthesised(u, DEFAULT_PLATFORM)
             g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
             idStore = ElkIdStore()
@@ -113,7 +137,7 @@ class SchematicLink(nodes.TextElement):
 
 class HwtSchematicDirective(Directive):
     required_arguments = 0
-    optional_arguments = 0
+    optional_arguments = 1
     has_content = True
     option_spec = {}
 
@@ -138,7 +162,11 @@ class HwtSchematicDirective(Directive):
         # targetid = "hwt-schematic-%d" % env.new_serialno('hwt-schematic')
         # targetnode = nodes.target('', '', ids=[targetid])
         self.copy_extra_static_files()
-        schema_node = SchematicLink()
+        constructor_fn = None
+        if self.arguments:
+            constructor_fn = self.arguments[0]
+
+        schema_node = SchematicLink(constructor_fn=constructor_fn)
         # schema_node += nodes.title(_('Schematic'), _('Todo'))
         self.state.nested_parse(self.content,
                                 self.content_offset,

@@ -101,6 +101,9 @@ class HwtSchematic_directive_TC(unittest.TestCase):
 
     def test_package(self):
         run_test("test_package")
+    
+    def test_speficified_constructor(self):
+        run_test("test_speficified_constructor")
 
     def test_not_a_Unit(self):
         with self.assertRaises(AssertionError):
@@ -109,7 +112,7 @@ class HwtSchematic_directive_TC(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    # suite.addTest(HwtSchematic_directive_TC('test_not_a_Unit'))
+    # suite.addTest(HwtSchematic_directive_TC('test_speficified_constructor'))
     suite.addTest(unittest.makeSuite(HwtSchematic_directive_TC))
     runner = unittest.TextTestRunner(verbosity=3)
     runner.run(suite)
