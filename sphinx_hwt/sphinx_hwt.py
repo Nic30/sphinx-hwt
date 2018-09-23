@@ -98,7 +98,7 @@ class SchematicLink(nodes.TextElement):
                     " for %s because it is not subclass of %r" % (absolute_name, Unit))
             u = unitCls()
         else:
-            _absolute_name = absolute_name.split(sep=".")[:1]
+            _absolute_name = absolute_name.split(sep=".")[:-1]
             _absolute_name.append(node._constructor_fn)
             constructor_fn = generic_import(_absolute_name)
             u = constructor_fn()
