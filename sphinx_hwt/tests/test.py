@@ -10,7 +10,8 @@ from unittest.mock import patch
 from docutils.nodes import GenericNodeVisitor
 from sphinx.cmdline import main as sphinx_main
 from sphinx.ext.apidoc import main as apidoc_main
-
+from os import listdir
+from os.path import isfile, join
 
 cwd = os.path.dirname(path.realpath(__file__))
 
@@ -20,7 +21,7 @@ sys.path.append(path.join(cwd, ".."))
 
 def _run_test():
     rmtree("doc/", ignore_errors=True)
-    rmtree("doc_buld/", ignore_errors=True)
+    rmtree("doc_build/", ignore_errors=True)
 
     # [OPTIONS] -o <OUTPUT_PATH> <MODULE_PATH> [EXCLUDE_PATTERN, ...]
     # apidoc_main(["-h"])
@@ -101,12 +102,20 @@ class HwtSchematic_directive_TC(unittest.TestCase):
 
     def test_package(self):
         run_test("test_package")
-    
+
     def test_speficified_constructor(self):
         run_test("test_speficified_constructor")
 
-    def test_test_speficified_constructor_nested(self):
+    def test_speficified_constructor_nested(self):
         run_test("test_speficified_constructor_nested")
+
+    def test_speficified_constructor_3x_nested(self):
+        test_name = "test_speficified_constructor_3x_nested"
+        run_test(test_name)
+        sch_dir = os.path.join(cwd, test_name, "doc_build/_static/hwt_schematics/")
+        sch_files = [f for f in listdir(sch_dir)
+                     if isfile(join(sch_dir, f))]
+        self.assertEqual(len(sch_files), 3)
 
     def test_not_a_Unit(self):
         with self.assertRaises(AssertionError):

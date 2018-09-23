@@ -14,7 +14,9 @@ from hwtGraph.elk.containers.idStore import ElkIdStore
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
+import logging
 
+# http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
 
 def synthesised(u: Unit, targetPlatform=DummyPlatform()):
     assert not u._wasSynthetised()
@@ -43,13 +45,13 @@ class SchematicPaths():
     SCHEMATIC_VIEWER_URL = "schematic_viewer/schematic_viewer.html"
     SCHEMATIC_DIR_PREFIX = "../../"  # relative path from SCHEMATIC_VIEWER_URL
     SCHEMATIC_FILES_DIR = "hwt_schematics"  # path relative to static dir
-    SCHEMATIC_FILES_EXTENSION = ".json"
+    SCHEMATIC_FILES_EXTENSION = "json"
     SCHEMATIC_VIEWER_SRC_DIR = path.join(path.dirname(__file__), "html")
 
     @classmethod
-    def get_sch_file_name_absolute(cls, document, absolute_name):
+    def get_sch_file_name_absolute(cls, document, absolute_name, serialno):
         return path.join(document.settings.env.app.builder.outdir,
-                         cls.get_sch_file_name(document, absolute_name))
+                         cls.get_sch_file_name(document, absolute_name, serialno))
 
     @classmethod
     def get_static_path(cls, document):
@@ -57,10 +59,12 @@ class SchematicPaths():
         return static_paths[0]
 
     @classmethod
-    def get_sch_file_name(cls, document, absolute_name):
+    def get_sch_file_name(cls, document, absolute_name, serialno):
         sp = cls.get_static_path(document)
-        return path.join(sp, cls.SCHEMATIC_FILES_DIR, absolute_name) \
-            + cls.SCHEMATIC_FILES_EXTENSION
+        return "%s-%s.%s" % (
+            path.join(sp, cls.SCHEMATIC_FILES_DIR, absolute_name),
+            serialno,
+            cls.SCHEMATIC_FILES_EXTENSION)
 
     @classmethod
     def get_sch_viewer_link(cls, document):
@@ -73,27 +77,35 @@ class SchematicPaths():
                          SchematicPaths.get_static_path(document),
                          "schematic_viewer")
 
+
 RE_IS_ID = re.compile("\w+")
 
-class SchematicLink(nodes.TextElement):
+
+class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
 
     def __init__(self, constructor_fn: Optional[str]=None, *args, **kwargs):
         """
         :param constructor_fn: optional name of explicit constructor function
         """
         super(SchematicLink, self).__init__(*args, **kwargs)
-        self._constructor_fn = constructor_fn
+        self["constructor_fn "] = constructor_fn 
 
     @staticmethod
     def visit_html(self, node):
+        """
+        Generate html elements and schematic json
+        """
         parentClsNode = node.parent.parent
         assert parentClsNode.attributes['objtype'] == 'class'
         assert parentClsNode.attributes['domain'] == 'py'
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
         absolute_name = sign.attributes['ids'][0]
+        _construct = node["constructor_fn "] 
+        serialno = node["serialno"]
+
         try:
-            if node._constructor_fn is None:
+            if _construct is None:
                 unitCls = generic_import(absolute_name)
                 if not issubclass(unitCls, Unit):
                     raise AssertionError(
@@ -101,7 +113,6 @@ class SchematicLink(nodes.TextElement):
                         " for %s because it is not subclass of %r" % (absolute_name, Unit))
                 u = unitCls()
             else:
-                _construct = node._constructor_fn
                 assert len(_construct) > 0 and RE_IS_ID.match(_construct), _construct
                 _absolute_name = []
                 assert ".." not in absolute_name, absolute_name
@@ -119,7 +130,7 @@ class SchematicLink(nodes.TextElement):
                             _absolute_name, Unit, u))
 
             schem_file = SchematicPaths.get_sch_file_name_absolute(
-                self.document, absolute_name)
+                self.document, absolute_name, serialno)
             makedirs(path.dirname(schem_file), exist_ok=True)
 
             with open(schem_file, "w") as f:
@@ -131,7 +142,7 @@ class SchematicLink(nodes.TextElement):
 
             viewer = SchematicPaths.get_sch_viewer_link(self.document)
             sch_name = SchematicPaths.get_sch_file_name(
-                self.document, absolute_name)
+                self.document, absolute_name, serialno)
             ref = nodes.reference(text=_("schematic"),  # internal=False,
                                   refuri="%s?schematic=%s" % (
                                       viewer,
@@ -139,14 +150,13 @@ class SchematicLink(nodes.TextElement):
                                                 sch_name)))
             node += ref
         except Exception as e:
+            logging.error(e, exc_info=True)
             raise Exception(
-                "Error  occured while processing of %s" % absolute_name, e)
-
-        self.visit_admonition(node)
+                "Error  occured while processing of %s" % absolute_name)
 
     @staticmethod
     def depart_html(self, node):
-        self.depart_admonition(node)
+        pass
 
 
 class HwtSchematicDirective(Directive):
@@ -182,8 +192,11 @@ class HwtSchematicDirective(Directive):
             constructor_fn = constructor_fn.strip()
             assert len(constructor_fn) >= 0
             assert RE_IS_ID.match(constructor_fn), constructor_fn
-
-        schema_node = SchematicLink(constructor_fn=constructor_fn)
+        
+        env = self.state.document.settings.env
+        serialno = env.new_serialno('SchematicLink')
+        schema_node = SchematicLink(constructor_fn=constructor_fn,
+                                    serialno=serialno)
 
         self.state.nested_parse(self.content,
                                 self.content_offset,
