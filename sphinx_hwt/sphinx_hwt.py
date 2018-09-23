@@ -1,18 +1,19 @@
-from docutils import nodes
-from docutils.parsers.rst import Directive
 import json
 from os import path, makedirs
+import re
 from shutil import copytree, rmtree
 from sphinx.addnodes import desc_signature
 from sphinx.locale import _
+from typing import Optional
 
+from docutils import nodes
+from docutils.parsers.rst import Directive
 from hwt.synthesizer.dummyPlatform import DummyPlatform
 from hwt.synthesizer.unit import Unit
 from hwtGraph.elk.containers.idStore import ElkIdStore
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
-from typing import Optional
 
 
 def synthesised(u: Unit, targetPlatform=DummyPlatform()):
@@ -72,6 +73,7 @@ class SchematicPaths():
                          SchematicPaths.get_static_path(document),
                          "schematic_viewer")
 
+RE_IS_ID = re.compile("\w+")
 
 class SchematicLink(nodes.TextElement):
 
@@ -99,12 +101,14 @@ class SchematicLink(nodes.TextElement):
                         " for %s because it is not subclass of %r" % (absolute_name, Unit))
                 u = unitCls()
             else:
+                _construct = node._constructor_fn
+                assert len(_construct) > 0 and RE_IS_ID.match(_construct), _construct
                 _absolute_name = []
                 assert ".." not in absolute_name, absolute_name
                 for n in  absolute_name.split(sep=".")[:-1]:
                     if n != "":
                         _absolute_name.append(n)
-                _absolute_name.append(node._constructor_fn)
+                _absolute_name.append(_construct)
                 
                 constructor_fn = generic_import(_absolute_name)
                 u = constructor_fn()
@@ -175,7 +179,9 @@ class HwtSchematicDirective(Directive):
         if self.arguments:
             assert len(self.arguments) == 1, self.arguments
             constructor_fn = self.arguments[0]
+            constructor_fn = constructor_fn.strip()
             assert len(constructor_fn) >= 0
+            assert RE_IS_ID.match(constructor_fn), constructor_fn
 
         schema_node = SchematicLink(constructor_fn=constructor_fn)
 
