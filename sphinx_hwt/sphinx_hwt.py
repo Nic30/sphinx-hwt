@@ -90,44 +90,49 @@ class SchematicLink(nodes.TextElement):
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
         absolute_name = sign.attributes['ids'][0]
-        if node._constructor_fn is None:
-            unitCls = generic_import(absolute_name)
-            if not issubclass(unitCls, Unit):
-                raise AssertionError(
-                    "Can not use hwt-schematic sphinx directive and create schematic"
-                    " for %s because it is not subclass of %r" % (absolute_name, Unit))
-            u = unitCls()
-        else:
-            _absolute_name = absolute_name.split(sep=".")[:-1]
-            _absolute_name.append(node._constructor_fn)
-            constructor_fn = generic_import(_absolute_name)
-            u = constructor_fn()
-            if not isinstance(u, Unit):
-                raise AssertionError(
-                    "Can not use hwt-schematic sphinx directive and create schematic"
-                    " for %s because function did not returned instance of %r, (%r)" % (
-                        _absolute_name, Unit, u))
+        try:
+            if node._constructor_fn is None:
+                unitCls = generic_import(absolute_name)
+                if not issubclass(unitCls, Unit):
+                    raise AssertionError(
+                        "Can not use hwt-schematic sphinx directive and create schematic"
+                        " for %s because it is not subclass of %r" % (absolute_name, Unit))
+                u = unitCls()
+            else:
+                _absolute_name = absolute_name.split(sep=".")[:-1]
+                _absolute_name.append(node._constructor_fn)
+                constructor_fn = generic_import(_absolute_name)
+                u = constructor_fn()
+                if not isinstance(u, Unit):
+                    raise AssertionError(
+                        "Can not use hwt-schematic sphinx directive and create schematic"
+                        " for %s because function did not returned instance of %r, (%r)" % (
+                            _absolute_name, Unit, u))
 
-        schem_file = SchematicPaths.get_sch_file_name_absolute(
-            self.document, absolute_name)
-        makedirs(path.dirname(schem_file), exist_ok=True)
+            schem_file = SchematicPaths.get_sch_file_name_absolute(
+                self.document, absolute_name)
+            makedirs(path.dirname(schem_file), exist_ok=True)
 
-        with open(schem_file, "w") as f:
-            synthesised(u, DEFAULT_PLATFORM)
-            g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
-            idStore = ElkIdStore()
-            data = g.toElkJson(idStore)
-            json.dump(data, f)
+            with open(schem_file, "w") as f:
+                synthesised(u, DEFAULT_PLATFORM)
+                g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
+                idStore = ElkIdStore()
+                data = g.toElkJson(idStore)
+                json.dump(data, f)
 
-        viewer = SchematicPaths.get_sch_viewer_link(self.document)
-        sch_name = SchematicPaths.get_sch_file_name(
-            self.document, absolute_name)
-        ref = nodes.reference(text=_("schematic"),  # internal=False,
-                              refuri="%s?schematic=%s" % (
-                                  viewer,
-                                  path.join(SchematicPaths.SCHEMATIC_DIR_PREFIX,
-                                            sch_name)))
-        node += ref
+            viewer = SchematicPaths.get_sch_viewer_link(self.document)
+            sch_name = SchematicPaths.get_sch_file_name(
+                self.document, absolute_name)
+            ref = nodes.reference(text=_("schematic"),  # internal=False,
+                                  refuri="%s?schematic=%s" % (
+                                      viewer,
+                                      path.join(SchematicPaths.SCHEMATIC_DIR_PREFIX,
+                                                sch_name)))
+            node += ref
+        except Exception as e:
+            raise Exception(
+                "Error  occured while processing of %s" % absolute_name, e)
+
         self.visit_admonition(node)
 
     @staticmethod
