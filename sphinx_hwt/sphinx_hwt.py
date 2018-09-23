@@ -99,8 +99,13 @@ class SchematicLink(nodes.TextElement):
                         " for %s because it is not subclass of %r" % (absolute_name, Unit))
                 u = unitCls()
             else:
-                _absolute_name = absolute_name.split(sep=".")[:-1]
+                _absolute_name = []
+                assert ".." not in absolute_name, absolute_name
+                for n in  absolute_name.split(sep=".")[:-1]:
+                    if n != "":
+                        _absolute_name.append(n)
                 _absolute_name.append(node._constructor_fn)
+                
                 constructor_fn = generic_import(_absolute_name)
                 u = constructor_fn()
                 if not isinstance(u, Unit):
@@ -141,10 +146,9 @@ class SchematicLink(nodes.TextElement):
 
 
 class HwtSchematicDirective(Directive):
-    required_arguments = 0
     optional_arguments = 1
-    has_content = True
-    option_spec = {}
+    final_argument_whitespace = False
+    has_content = False
 
     def __init__(self, *args, **kwargs):
         Directive.__init__(self, *args, **kwargs)
@@ -169,10 +173,12 @@ class HwtSchematicDirective(Directive):
         self.copy_extra_static_files()
         constructor_fn = None
         if self.arguments:
+            assert len(self.arguments) == 1, self.arguments
             constructor_fn = self.arguments[0]
+            assert len(constructor_fn) >= 0
 
         schema_node = SchematicLink(constructor_fn=constructor_fn)
-        # schema_node += nodes.title(_('Schematic'), _('Todo'))
+
         self.state.nested_parse(self.content,
                                 self.content_offset,
                                 schema_node)
