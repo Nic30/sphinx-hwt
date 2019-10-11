@@ -153,6 +153,7 @@ setup(
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
         "Topic :: System :: Hardware",
         "Topic :: Utilities",
+        'Topic :: Scientific/Engineering :: Visualization',
     ],
     cmdclass={
         'build': build,  # clean generated files
