@@ -5,7 +5,7 @@ from hwt.synthesizer.param import Param
 
 def example_constructor():
     u = ExampleCls0()
-    u.WIDTH.set(32)
+    u.WIDTH = 32
     return u
 
 

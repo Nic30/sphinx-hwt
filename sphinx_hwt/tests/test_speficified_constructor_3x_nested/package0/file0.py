@@ -5,13 +5,13 @@ from hwt.synthesizer.param import Param
 
 def example_constructor():
     u = ExampleCls0()
-    u.WIDTH.set(32)
+    u.WIDTH = 32
     return u
 
 
 def example_constructor2():
     u = ExampleCls0()
-    u.WIDTH.set(64)
+    u.WIDTH = 64
     return u
 
 
@@ -31,7 +31,7 @@ class ExampleCls0(Unit):
     .. hwt-schematic:: example_constructor2
     """
 
-    def _config(self)->None:
+    def _config(self):
         self.WIDTH = Param(1)
 
     def _declr(self):

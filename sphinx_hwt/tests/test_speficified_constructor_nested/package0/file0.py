@@ -5,7 +5,7 @@ from hwt.synthesizer.param import Param
 
 def example_constructor():
     u = ExampleCls0()
-    u.WIDTH.set(32)
+    u.WIDTH = 32
     return u
 
 
@@ -15,7 +15,7 @@ class ExampleCls0(Unit):
 
     """
 
-    def _config(self)->None:
+    def _config(self):
         self.WIDTH = Param(1)
 
     def _declr(self):
