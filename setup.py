@@ -35,7 +35,7 @@ def npm_installation_check():
 def run_npm_install():
     my_env = os.environ.copy()
     # PYTHONPATH has to be removed because webworker-threads (d3-hwschematic -> elk -> )
-    # has install time dependency on python2 and PYTHONPATH 
+    # has install time dependency on python2 and PYTHONPATH
     # overrideds python2 import paths
     if "PYTHONPATH" in my_env:
         del my_env["PYTHONPATH"]
@@ -134,8 +134,8 @@ setup(
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     install_requires=[
-        'sphinx>=1.7.6',  # base sphinx doc generator
-        'hwtGraph>=0.7',  # converts HWT Units to schematics
+        'sphinx>=2.2.1',  # base sphinx doc generator
+        'hwtGraph>=0.9',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

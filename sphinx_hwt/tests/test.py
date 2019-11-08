@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from docutils.nodes import GenericNodeVisitor
-from sphinx.cmdline import main as sphinx_main
+from sphinx.cmd.build import main as sphinx_main
 from sphinx.ext.apidoc import main as apidoc_main
 from os import listdir
 from os.path import isfile, join
@@ -82,6 +82,7 @@ def run_test(test_name, mock_stdout=False, mock_stderr=False):
         for name, m in list(sys.modules.items()):
             if isinstance(m, ModuleType) \
                     and hasattr(m, "__file__") \
+                    and m.__file__ is not None \
                     and m.__file__.startswith("./"):
                 del sys.modules[name]
 
