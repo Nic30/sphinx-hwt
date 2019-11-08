@@ -135,7 +135,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'sphinx>=2.2.1',  # base sphinx doc generator
-        'hwtGraph>=0.9',  # converts HWT Units to schematics
+        'hwtGraph>=1.0',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
