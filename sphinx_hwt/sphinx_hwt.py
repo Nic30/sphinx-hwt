@@ -98,8 +98,10 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
         Generate html elements and schematic json
         """
         parentClsNode = node.parent.parent
-        assert parentClsNode.attributes['objtype'] == 'class'
-        assert parentClsNode.attributes['domain'] == 'py'
+        assert parentClsNode.attributes['objtype'] == 'class',\
+            (parentClsNode.attributes['objtype'], parentClsNode)
+        assert parentClsNode.attributes['domain'] == 'py',\
+            parentClsNode.attributes['domain']
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
         absolute_name = sign.attributes['ids'][0]
@@ -118,7 +120,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
                 assert len(_construct) > 0 and RE_IS_ID.match(_construct), _construct
                 _absolute_name = []
                 assert ".." not in absolute_name, absolute_name
-                for n in  absolute_name.split(sep=".")[:-1]:
+                for n in absolute_name.split(sep=".")[:-1]:
                     if n != "":
                         _absolute_name.append(n)
                 _absolute_name.append(_construct)
