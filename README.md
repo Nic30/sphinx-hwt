@@ -48,6 +48,3 @@ Link on schematic will be added to class documentation.
   * zoom, pan, dynamic colapsing, net-select, searching and filtering
   * schematic rendered by [d3-hwschematic library](https://github.com/Nic30/d3-hwschematic)
   * Unit instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
-
-## Near feature list (will add in 2018-8-xx)
-* signal waves by [d3-wave library](https://github.com/Nic30/d3-wave)

@@ -24,7 +24,6 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-node_modules
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -103,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Eclipse project
+.pydevproject
+.project
+.settings/
+
+# npm tmp files
+package-lock.json
+node_modules

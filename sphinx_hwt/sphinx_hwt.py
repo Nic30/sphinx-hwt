@@ -18,6 +18,7 @@ import logging
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
 
+
 def synthesised(u: Unit, targetPlatform=DummyPlatform()):
     assert not u._wasSynthetised()
     u._loadDeclarations()
@@ -56,6 +57,8 @@ class SchematicPaths():
     @classmethod
     def get_static_path(cls, document):
         static_paths = document.settings.env.config.html_static_path
+        if not static_paths:
+            return "_static"
         return static_paths[0]
 
     @classmethod
@@ -88,7 +91,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
         :param constructor_fn: optional name of explicit constructor function
         """
         super(SchematicLink, self).__init__(*args, **kwargs)
-        self["constructor_fn "] = constructor_fn 
+        self["constructor_fn "] = constructor_fn
 
     @staticmethod
     def visit_html(self, node):
@@ -96,12 +99,14 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
         Generate html elements and schematic json
         """
         parentClsNode = node.parent.parent
-        assert parentClsNode.attributes['objtype'] == 'class'
-        assert parentClsNode.attributes['domain'] == 'py'
+        assert parentClsNode.attributes['objtype'] == 'class',\
+            (parentClsNode.attributes['objtype'], parentClsNode)
+        assert parentClsNode.attributes['domain'] == 'py',\
+            parentClsNode.attributes['domain']
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
-        absolute_name = sign.attributes['ids'][0]
-        _construct = node["constructor_fn "] 
+        absolute_name = sign.attributes['names'][0]
+        _construct = node["constructor_fn "]
         serialno = node["serialno"]
 
         try:
@@ -116,11 +121,11 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
                 assert len(_construct) > 0 and RE_IS_ID.match(_construct), _construct
                 _absolute_name = []
                 assert ".." not in absolute_name, absolute_name
-                for n in  absolute_name.split(sep=".")[:-1]:
+                for n in absolute_name.split(sep=".")[:-1]:
                     if n != "":
                         _absolute_name.append(n)
                 _absolute_name.append(_construct)
-                
+
                 constructor_fn = generic_import(_absolute_name)
                 u = constructor_fn()
                 if not isinstance(u, Unit):
@@ -192,7 +197,7 @@ class HwtSchematicDirective(Directive):
             constructor_fn = constructor_fn.strip()
             assert len(constructor_fn) >= 0
             assert RE_IS_ID.match(constructor_fn), constructor_fn
-        
+
         env = self.state.document.settings.env
         serialno = env.new_serialno('SchematicLink')
         schema_node = SchematicLink(constructor_fn=constructor_fn,

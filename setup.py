@@ -35,7 +35,7 @@ def npm_installation_check():
 def run_npm_install():
     my_env = os.environ.copy()
     # PYTHONPATH has to be removed because webworker-threads (d3-hwschematic -> elk -> )
-    # has install time dependency on python2 and PYTHONPATH 
+    # has install time dependency on python2 and PYTHONPATH
     # overrideds python2 import paths
     if "PYTHONPATH" in my_env:
         del my_env["PYTHONPATH"]
@@ -123,7 +123,7 @@ class clean(_clean):
 
 setup(
     name='sphinx-hwt',
-    version='1.6',
+    version='2.2',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
     description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
@@ -134,8 +134,8 @@ setup(
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     install_requires=[
-        'sphinx>=1.7.6',  # base sphinx doc generator
-        'hwtGraph>=0.7',  # converts HWT Units to schematics
+        'sphinx>=2.3.1',  # base sphinx doc generator
+        'hwtGraph>=1.3',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
