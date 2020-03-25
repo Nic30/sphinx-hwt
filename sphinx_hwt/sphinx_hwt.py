@@ -18,6 +18,7 @@ import logging
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
 
+
 def synthesised(u: Unit, targetPlatform=DummyPlatform()):
     assert not u._wasSynthetised()
     u._loadDeclarations()
@@ -104,7 +105,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
             parentClsNode.attributes['domain']
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
-        absolute_name = sign.attributes['ids'][0]
+        absolute_name = sign.attributes['names'][0]
         _construct = node["constructor_fn "]
         serialno = node["serialno"]
 
