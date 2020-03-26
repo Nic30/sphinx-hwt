@@ -1,22 +1,14 @@
-dist: trusty
+dist: bionic
 language: python
 git:
   depth: 1
 cache:
   apt: true
 python:
-- '3.6'
+- '3.7'
 install:
 - pip install pytest coveralls
-- cd ..
-- git clone --depth=1 https://github.com/Nic30/hwt.git
-- cd hwt
-- python setup.py install
-- cd ..
-- git clone --depth=1 https://github.com/Nic30/hwtGraph.git
-- cd hwtGraph
-- python setup.py install
-- cd ../sphinx-hwt
+- pip install -r .travis/requirements.hwtGraph.txt
 - python setup.py install
 - rm -r node_modules
 script:
