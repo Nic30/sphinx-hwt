@@ -10,8 +10,6 @@ install:
 - pip install pytest coveralls
 - pip install -r .travis/requirements.hwtGraph.txt
 - python setup.py install
-- cd ../sphinx-hwt
-- python setup.py install
 - rm -r node_modules
 script:
 - coverage run --source=sphinx_hwt setup.py test
