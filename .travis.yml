@@ -5,7 +5,7 @@ git:
 cache:
   apt: true
 python:
-- '3.7'
+- '3.8'
 install:
 - pip install pytest coveralls
 - pip install -r .travis/requirements.hwtGraph.txt
