@@ -96,7 +96,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
             parentClsNode.attributes['domain']
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
-        absolute_name = sign.attributes['names'][0]
+        absolute_name = sign.attributes['ids'][0]
         _construct = node["constructor_fn "]
         serialno = node["serialno"]
 
