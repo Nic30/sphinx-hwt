@@ -104,6 +104,9 @@ class HwtSchematic_directive_TC(unittest.TestCase):
     def test_package(self):
         run_test("test_package")
 
+    def test_package_caseSensitive(self):
+        run_test("test_package_caseSensitive")
+
     def test_speficified_constructor(self):
         run_test("test_speficified_constructor")
 

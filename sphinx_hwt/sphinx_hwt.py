@@ -8,24 +8,15 @@ from typing import Optional
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
-from hwt.synthesizer.dummyPlatform import DummyPlatform
 from hwt.synthesizer.unit import Unit
 from hwtGraph.elk.containers.idStore import ElkIdStore
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
 import logging
+from hwt.synthesizer.utils import synthesised
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
-
-
-def synthesised(u: Unit, targetPlatform=DummyPlatform()):
-    assert not u._wasSynthetised()
-    u._loadDeclarations()
-
-    for _ in u._toRtl(targetPlatform):
-        pass
-    return u
 
 
 def generic_import(name):
@@ -105,7 +96,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
             parentClsNode.attributes['domain']
         sign = node.parent.parent.children[0]
         assert isinstance(sign, desc_signature)
-        absolute_name = sign.attributes['names'][0]
+        absolute_name = sign.attributes['ids'][0]
         _construct = node["constructor_fn "]
         serialno = node["serialno"]
 
