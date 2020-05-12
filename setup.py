@@ -7,13 +7,12 @@ from distutils.command.sdist import sdist as _sdist
 from os import path
 import os
 from os.path import dirname, abspath
+from setuptools import find_packages, setup, Command
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from shutil import copyfile
 from shutil import rmtree
 from subprocess import check_call
 import sys
-
-from setuptools import find_packages, setup, Command
 
 
 TOP_DIR = dirname(abspath(__file__))
@@ -135,7 +134,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'sphinx>=3.0.3',  # base sphinx doc generator
-        'hwtGraph>=1.3',  # converts HWT Units to schematics
+        'hwtGraph>=1.4',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
