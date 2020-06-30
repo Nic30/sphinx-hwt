@@ -19,7 +19,7 @@ TOP_DIR = dirname(abspath(__file__))
 
 JS_FILES = [
     "node_modules/d3/dist/d3.js",
-    "node_modules//elkjs/lib/elk.bundled.js",
+    "node_modules/elkjs/lib/elk.bundled.js",
     "node_modules/d3-hwschematic/dist/d3-hwschematic.js",
 ]
 
