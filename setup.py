@@ -126,7 +126,7 @@ setup(
     version='2.3',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
-    description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
+    description="Sphinx extension to produce interactive schematic for hardware written in HWT",
     license='BSD-3-Clause',
     keywords='sphinx documentation HWT FPGA hardware VHDL System Verilog schematic wave',
     url='https://github.com/Nic30/sphinx-hwt',
