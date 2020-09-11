@@ -19,7 +19,7 @@ TOP_DIR = dirname(abspath(__file__))
 
 JS_FILES = [
     "node_modules/d3/dist/d3.js",
-    "node_modules//elkjs/lib/elk.bundled.js",
+    "node_modules/elkjs/lib/elk.bundled.js",
     "node_modules/d3-hwschematic/dist/d3-hwschematic.js",
 ]
 
@@ -123,10 +123,10 @@ class clean(_clean):
 
 setup(
     name='sphinx-hwt',
-    version='2.3',
+    version='2.4',
     author="Michal Orsak",
     author_email="michal.o.socials@gmail.com",
-    description="Sphinx extension to produce interactive schematic for hardware writen in HWT",
+    description="Sphinx extension to produce interactive schematic for hardware written in HWT",
     license='BSD-3-Clause',
     keywords='sphinx documentation HWT FPGA hardware VHDL System Verilog schematic wave',
     url='https://github.com/Nic30/sphinx-hwt',
@@ -135,7 +135,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         'sphinx>=3.0.3',  # base sphinx doc generator
-        'hwtGraph>=1.4',  # converts HWT Units to schematics
+        'hwtGraph>=1.8',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
