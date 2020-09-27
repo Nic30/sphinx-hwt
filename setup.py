@@ -21,6 +21,7 @@ JS_FILES = [
     "node_modules/d3/dist/d3.js",
     "node_modules/elkjs/lib/elk.bundled.js",
     "node_modules/d3-hwschematic/dist/d3-hwschematic.js",
+    "node_modules/d3-hwschematic/dist/d3-hwschematic.css",
 ]
 
 
@@ -83,7 +84,7 @@ class build_npm(Command):
         if has_npm:
             run_npm_install()
         else:
-            print("Warning: npm not installed using prebuilded js files!",
+            print("Warning: npm not installed using pre-builded js files!",
                   file=sys.stderr)
         """
         Download npm packages required by package.json and extract required
@@ -99,11 +100,11 @@ class build_npm(Command):
                 print("copy generated from NPM packages", installed_js_name)
             else:
                 if os.path.exists(installed_js_name):
-                    print("using prebuilded", installed_js_name)
+                    print("using pre-builded", installed_js_name)
                 else:
                     raise Exception("Can not find npm,"
                                     " which is required for the installation "
-                                    "and this is pacpage has not js prebuilded")
+                                    "and this is package has not js pre-builded")
 
 
 class build(_build):
