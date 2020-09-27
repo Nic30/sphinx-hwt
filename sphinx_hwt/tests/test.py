@@ -1,17 +1,17 @@
+from docutils.nodes import GenericNodeVisitor
 from io import StringIO
+from os import listdir
 from os import path
 import os
+from os.path import isfile, join
 from shutil import rmtree
+from sphinx.cmd.build import main as sphinx_main
+from sphinx.ext.apidoc import main as apidoc_main
 import sys
 from types import ModuleType
 import unittest
 from unittest.mock import patch
 
-from docutils.nodes import GenericNodeVisitor
-from sphinx.cmd.build import main as sphinx_main
-from sphinx.ext.apidoc import main as apidoc_main
-from os import listdir
-from os.path import isfile, join
 
 cwd = os.path.dirname(path.realpath(__file__))
 
