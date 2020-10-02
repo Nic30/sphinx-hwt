@@ -1,6 +1,6 @@
 {
 	"name": "sphinx-hwt-js",
-	"license": "BSD-3-Clause",
+	"license": "MIT",
 	"description": "dummy package.json to download js dependencies",
 	"repository": "https://github.com/Nic30/sphinx-hwt",
 	"dependencies": {
