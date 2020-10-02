@@ -45,10 +45,10 @@
 			svg.attr("height", w.height);
         }
 
-        var g = new d3.HwSchematic(svg);
+        var hwSchematic = new d3.HwSchematic(svg);
         var zoom = d3.zoom();
         zoom.on("zoom", function applyTransform() {
-            g.root.attr("transform", d3.event.transform)
+        	hwSchematic.root.attr("transform", d3.event.transform)
         });
 
         // disable zoom on doubleclick 
@@ -78,7 +78,7 @@
               if (graph.hwt && graph.hwt.name)
                   document.title = graph.hwt.name;
               // load the data and render the elements
-              g.bindData(graph);
+              hwSchematic.bindData(graph);
            });
     </script>
 </body>
