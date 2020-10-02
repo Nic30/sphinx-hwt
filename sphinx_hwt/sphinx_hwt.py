@@ -1,4 +1,7 @@
+from docutils import nodes
+from docutils.parsers.rst import Directive
 import json
+import logging
 from os import path, makedirs
 import re
 from shutil import copytree, rmtree
@@ -6,19 +9,15 @@ from sphinx.addnodes import desc_signature
 from sphinx.locale import _
 from typing import Optional
 
-from docutils import nodes
-from docutils.parsers.rst import Directive
 from hwt.synthesizer.unit import Unit
+from hwt.synthesizer.utils import synthesised
 from hwtGraph.elk.containers.idStore import ElkIdStore
 from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
-import logging
-from hwt.synthesizer.utils import synthesised
+
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
-
-
 def generic_import(name):
     if isinstance(name, str):
         components = name.split('.')
