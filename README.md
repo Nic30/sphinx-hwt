@@ -28,7 +28,7 @@ From now Sphinx will be able to use directives from sphinx-hwt to render schemat
 
 ## Usage
 
-Add hwt-schematic directive in docstring of Unit class like this.
+Add hwt-schematic directive in docstring of Unit class like this (will add scheme to a html doc).
 
 ```python
 from hwt.synthesizer.unit import Unit
@@ -47,11 +47,7 @@ class ExampleCls0(Unit):
     There are also other directives, read the feature list below.
     """
 
-
 ```
-
-Link on schematic will be added to class documentation.
-
 
 
 ## Feature list
