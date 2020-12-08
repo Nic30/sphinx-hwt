@@ -8,6 +8,7 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
 from sphinx_hwt.directive_params import HwtParamsDirective
 from sphinx_hwt.directive_interfaces import HwtInterfacesDirective
 from sphinx_hwt.directive_schematic import HwtSchematicDirective
+from sphinx_hwt.directive_components import HwtComponentsDirective
 
 
 class HwtAutodocDirective(HwtSchematicDirective):
@@ -27,8 +28,9 @@ class HwtAutodocDirective(HwtSchematicDirective):
         interfaces = HwtInterfacesDirective.run(self)
 
         if isinstance(u, Unit):
+            components = HwtComponentsDirective.run(self)
             schemes = HwtSchematicDirective.run(self)
-            return [*params, *interfaces, *schemes]
+            return [*params, *interfaces, *components, *schemes]
         else:
             return [*params, *interfaces]
 
