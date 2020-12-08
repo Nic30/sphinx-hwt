@@ -33,10 +33,21 @@ Add hwt-schematic directive in docstring of Unit class like this.
 ```python
 from hwt.synthesizer.unit import Unit
 
+def explicit_constructor():
+    return ExampleCls0()
+
 class ExampleCls0(Unit):
     """
     .. hwt-schematic::
+
+    or
+
+    .. hwt-schematic:: explicit_constructor
+
+    There are also other directives, read the feature list below.
     """
+
+
 ```
 
 Link on schematic will be added to class documentation.
@@ -44,7 +55,11 @@ Link on schematic will be added to class documentation.
 
 
 ## Feature list
-* generate interactive schematic for Unit instances (= module in verilog, entity + architecutere in VHDL).
-  * zoom, pan, dynamic colapsing, net-select, searching and filtering
-  * schematic rendered by [d3-hwschematic library](https://github.com/Nic30/d3-hwschematic)
-  * Unit instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
+* hwt-params - generates a list of hwt Params for Interface/Unit classes with a information about value and type
+* hwt-interface - generates a list of IO interfaces of the Interface/Unit class
+* hwt-schematic:
+  * generate interactive schematic for Unit instances (= module in verilog, entity + architecutere in VHDL).
+    * zoom, pan, dynamic colapsing, net-select, searching and filtering
+    * schematic rendered by [d3-hwschematic library](https://github.com/Nic30/d3-hwschematic)
+    * Unit instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
+* hwt-autodoc: hwt-params, hwt-interface and hwt-schematic at once

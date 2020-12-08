@@ -1,0 +1,107 @@
+from docutils import nodes
+from docutils.parsers.rst import Directive
+import logging
+from sphinx.application import Sphinx
+from sphinx.locale import _
+from typing import Dict, List, Optional
+
+from hwt.synthesizer.interface import Interface
+from hwt.synthesizer.param import Param
+from hwt.synthesizer.unit import Unit
+from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
+    hwt_objs, merge_variable_lists_into_hwt_objs, \
+    get_instance_from_directive_node
+
+
+class hwt_params(hwt_objs):
+    """
+    A directive which adds a list of defined HDL parameters for Unit innstances
+    The message also contains information about default value and type of the parameter.
+    """
+
+    def __init__(self, obj_list: List[Param],
+                 extra_doc: Optional[Dict[str, List[nodes.Element]]]=None,
+                 rawsource='',
+                 *children, **attributes):
+        super(hwt_params, self).__init__(obj_list, extra_doc, rawsource, *children, **attributes)
+
+    @staticmethod
+    def obj_get_name(o: Param):
+        return o._name
+
+    @staticmethod
+    def visit_html(self, node: "hwt_params"):
+        """
+        Generate html elements and schematic json
+        """
+        if not node.obj_list:
+            return
+
+        field_list = nodes.field_list()
+        node += field_list
+
+        params_list = nodes.bullet_list()
+        def_val = _('default value')
+        of_type = _('of type')
+        for p in sorted(node.obj_list, key=node.obj_get_name):
+            name = node.obj_get_name(p)
+            v = p.get_value()
+            t = getattr(v, "_dtype", None)
+            if t is None:
+                t = v.__class__
+
+            p_p = nodes.paragraph()
+            p_p += nodes.strong(name, name)
+            annotation = f" - {def_val} {v} {of_type} {t}\n"
+            p_p += nodes.Text(annotation)
+            extra = node.extra_doc.get(name, None)
+            if extra:
+                p_p += extra
+
+            params_list += nodes.list_item('', p_p)
+
+        params_desc = nodes.field()
+        params_desc += nodes.field_name(_('HDL params'), _('HDL params'))
+        field_list += params_desc
+        field_list += nodes.field_body('', params_list)
+
+    @staticmethod
+    def depart_html(self, node: "hwt_params"):
+        pass
+
+
+class HwtParamsDirective(Directive):
+    optional_arguments = 1
+    final_argument_whitespace = False
+    has_content = False
+
+    def run(self):
+        param_list = []
+        try:
+            u = get_instance_from_directive_node(self, (Interface, Unit))
+            param_list = u._params
+        except Exception as e:
+            absolute_name = get_absolute_name_of_class_of_node(self.state)
+            logging.error(e, exc_info=True)
+            raise Exception(
+                "Error  occured while processing of %s" % absolute_name)
+
+        params = hwt_params(param_list)
+
+        self.state.nested_parse(self.content,
+                    self.content_offset,
+                    params)
+        return [params, ]
+
+
+def merge_variable_lists_into_hwt_params(app: Sphinx, domain: str, objtype: str, contentnode: nodes.Element):
+    return merge_variable_lists_into_hwt_objs(app, domain, objtype, contentnode, hwt_params)
+
+
+def setup(app: Sphinx):
+    app.connect('object-description-transform', merge_variable_lists_into_hwt_params)
+    app.add_node(hwt_params,
+                 html=(hwt_params.visit_html,
+                       hwt_params.depart_html))
+    app.add_directive('hwt-params', HwtParamsDirective)
+

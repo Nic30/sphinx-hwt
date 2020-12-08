@@ -1,93 +1,14 @@
 from docutils.nodes import GenericNodeVisitor
-from io import StringIO
 from os import listdir
-from os import path
 import os
 from os.path import isfile, join
-from shutil import rmtree
-from sphinx.cmd.build import main as sphinx_main
-from sphinx.ext.apidoc import main as apidoc_main
-import sys
-from types import ModuleType
 import unittest
-from unittest.mock import patch
 
-
-cwd = os.path.dirname(path.realpath(__file__))
-
-# allow to use this extension
-sys.path.append(path.join(cwd, ".."))
-
-
-def _run_test():
-    rmtree("doc/", ignore_errors=True)
-    rmtree("doc_build/", ignore_errors=True)
-
-    # [OPTIONS] -o <OUTPUT_PATH> <MODULE_PATH> [EXCLUDE_PATTERN, ...]
-    # apidoc_main(["-h"])
-    ret = apidoc_main(["--module-first", "--force", "--full",
-                       "--output-dir", "doc/", "."])
-
-    if ret != 0:
-        raise AssertionError("apidoc_main failed with err %d" % ret)
-
-    # -b buildername
-    # -a If given, always write all output files. The default is to only write output files for new and changed source files. (This may not apply to all builders.)
-    # -E Don’t use a saved environment (the structure caching all cross-references), but rebuild it completely. The default is to only read and parse source files that are new or have changed since the last run.
-    # -C Don’t look for a configuration file; only take options via the -D option.
-    # [OPTIONS] SOURCEDIR OUTPUTDIR [FILENAMES...]
-
-    # sphinx_main(["-h"])
-    ret = sphinx_main(["-b", "html", "-E",
-                       "-c", cwd,
-                       "doc/",
-                       "doc_build/",
-                       ])
-    if ret != 0:
-        raise AssertionError("sphinx_main failed with err %d" % ret)
-
-
-def run_test(test_name, mock_stdout=False, mock_stderr=False):
-    """
-    Build documentation in specified test folder
-    """
-    test_path = path.join(cwd, test_name)
-    try:
-        os.chdir(test_path)
-        # allow test modules import
-        sys.path.append(".")
-
-        stderr = sys.stderr
-        if mock_stderr:
-            stderr = StringIO()
-
-        stdout = sys.stdout
-        if mock_stdout:
-            stdout = StringIO()
-
-        @patch("sys.stdout", new=stdout)
-        @patch("sys.stderr", new=stderr)
-        def mocked_run_test():
-            return _run_test()
-
-        return mocked_run_test()
-    finally:
-        if not mock_stdout:
-            sys.stdout.flush()
-        if not mock_stderr:
-            sys.stderr.flush()
-
-        os.chdir(cwd)
-        sys.path.pop()
-        for name, m in list(sys.modules.items()):
-            if isinstance(m, ModuleType) \
-                    and hasattr(m, "__file__") \
-                    and m.__file__ is not None \
-                    and m.__file__.startswith("./"):
-                del sys.modules[name]
+from sphinx_hwt.tests.utils import cwd, run_test
 
 
 class HwtSchematic_directive_TC(unittest.TestCase):
+
     def setUp(self):
         names_to_delete = ["visit_SchematicLink", "depart_SchematicLink"]
 
@@ -126,9 +47,63 @@ class HwtSchematic_directive_TC(unittest.TestCase):
             run_test("test_not_a_Unit", mock_stderr=True)
 
 
+class HwtParams_directive_TC(unittest.TestCase):
+
+    def test_params_none(self):
+        run_test("test_params_none")
+
+    def test_params_2(self):
+        run_test("test_params_2")
+
+    def test_params_with_ivar(self):
+        run_test("test_params_with_ivar")
+
+
+class HwtInterfaces_directive_TC(unittest.TestCase):
+
+    def test_interfaces_Unit_intf(self):
+        run_test("test_interfaces_Unit_intf")
+
+    def test_interfaces_Unit_intf_reference(self):
+        run_test("test_interfaces_Unit_intf_reference")
+
+    def test_interfaces_Unit_intf_with_ivar(self):
+        run_test("test_interfaces_Unit_intf_with_ivar")
+
+    def test_interfaces_Interface_intf(self):
+        run_test("test_interfaces_Interface_intf")
+
+    def test_interfaces_Interface_intf_reference(self):
+        run_test("test_interfaces_Interface_intf_reference")
+
+    def test_interfaces_Interface_intf_with_ivar(self):
+        run_test("test_interfaces_Interface_intf_with_ivar")
+
+
+class HwtAutodoc_directive_TC(unittest.TestCase):
+
+    def test_autodoc_Interface(self):
+        run_test("test_autodoc_Interface")
+
+    def test_autodoc_Unit(self):
+        run_test("test_autodoc_Unit")
+
+
+TCs = [
+    HwtSchematic_directive_TC,
+    HwtParams_directive_TC,
+    HwtInterfaces_directive_TC,
+    HwtAutodoc_directive_TC,
+]
+
 if __name__ == "__main__":
+    import sys
     suite = unittest.TestSuite()
     # suite.addTest(HwtSchematic_directive_TC('test_test_speficified_constructor_nested'))
-    suite.addTest(unittest.makeSuite(HwtSchematic_directive_TC))
+    for tc in TCs:
+        suite.addTest(unittest.makeSuite(tc))
     runner = unittest.TextTestRunner(verbosity=3)
-    runner.run(suite)
+    res = runner.run(suite)
+    if not res.wasSuccessful():
+        sys.exit(1)
+
