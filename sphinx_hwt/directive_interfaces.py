@@ -9,6 +9,7 @@ from hwt.synthesizer.interface import Interface
 from hwt.synthesizer.unit import Unit
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, hwt_objs, merge_variable_lists_into_hwt_objs, \
     get_instance_from_directive_node
+from ipCorePackager.constants import INTF_DIRECTION, DIRECTION
 
 
 class hwt_interfaces(hwt_objs):
@@ -78,6 +79,11 @@ class HwtInterfacesDirective(Directive):
             t = typing.stringify(i.__class__)
             if dt is not None:
                 t = f"{t} with dtype={dt}"
+            d = INTF_DIRECTION.opposite(i._direction)
+            t = f"{t} - {d.name}"
+            if i._masterDir != DIRECTION.OUT:
+                t = f"{t} (Master={i._masterDir.name})"
+
             interfaces_serialized.append((name, t, None))
 
         interfaces = hwt_interfaces(interfaces_serialized)
