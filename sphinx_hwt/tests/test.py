@@ -58,6 +58,9 @@ class HwtParams_directive_TC(unittest.TestCase):
     def test_params_with_ivar(self):
         run_test("test_params_with_ivar")
 
+    def test_params_of_unpicklable_type(self):
+        run_test('test_params_of_unpicklable_type')
+
 
 class HwtInterfaces_directive_TC(unittest.TestCase):
 

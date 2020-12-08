@@ -40,6 +40,8 @@ class hwt_objs(nodes.General, nodes.Element):
     """
     A directive which adds a list of HDL defined interfaces for Unit innstances
     The message also contains information about default value and type of the parameter.
+
+    :ivar obj_list: format (name, type_str, value_str)
     """
 
     def __init__(self, obj_list: list, extra_param_doc: Optional[Dict[str, List[nodes.Element]]]=None, rawsource='', *children, **attributes):
@@ -122,7 +124,7 @@ def merge_variable_lists_into_hwt_objs(app: Sphinx, domain: str, objtype: str, c
 
 
 def merge_field_lists_to_hdl_objs(field_list: nodes.field_list, hwt_obj_list: hwt_objs):
-    obj_names = set(hwt_obj_list.obj_get_name(p) for p in hwt_obj_list.obj_list)
+    obj_names = set(o[0] for o in hwt_obj_list.obj_list)
     extra_doc = hwt_obj_list.extra_doc
     to_remove = []
     for field in list(field_list):
