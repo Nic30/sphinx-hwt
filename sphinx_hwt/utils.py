@@ -38,7 +38,7 @@ def get_absolute_name_of_class_of_node(node):
 
 class hwt_objs(nodes.General, nodes.Element):
     """
-    A directive which adds a list of HDL defined interfaces for Unit innstances
+    A directive which adds a list of HDL defined interfaces for Unit instances
     The message also contains information about default value and type of the parameter.
 
     :ivar obj_list: format (name, type_str, value_str)
