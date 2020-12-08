@@ -1,10 +1,10 @@
-import re
-from typing import Union, List, Optional, Dict
-from sphinx.addnodes import desc_signature
-from hwt.synthesizer.unit import Unit
-from docutils.parsers.rst import Directive
-from sphinx.application import Sphinx
 from docutils import nodes
+from docutils.parsers.rst import Directive
+import re
+from sphinx.addnodes import desc_signature
+from sphinx.application import Sphinx
+from typing import Union, List, Optional, Dict
+
 
 RE_IS_ID = re.compile("\w+")
 
@@ -45,37 +45,26 @@ class hwt_objs(nodes.General, nodes.Element):
     """
 
     def __init__(self, obj_list: list, extra_param_doc: Optional[Dict[str, List[nodes.Element]]]=None, rawsource='', *children, **attributes):
+        super(hwt_objs, self).__init__(rawsource, *children, **attributes)
         if extra_param_doc is None:
             extra_param_doc = {}
-        self.extra_doc = extra_param_doc
-        self.obj_list = obj_list
-        super(hwt_objs, self).__init__(rawsource, *children, **attributes)
+        self["extra_doc"] = extra_param_doc
+        self["obj_list"] = obj_list
 
 
-def get_instance_from_directive_node(directive: Directive, allowed_classes):
-    '''
-    Converts
-
-    .. code-block:: Python
-        """
-        .. directive:
-        .. directive: constructor_fn_name
-        """
-
-    to instance, if constructor_fn_name is not specified the current class instantiated.
-    '''
-
-    node = directive.state
-    constructor_fn_name = None
+def get_constructor_name(directive: Directive):
     if directive.arguments:
         assert len(directive.arguments) == 1, directive.arguments
         constructor_fn_name = directive.arguments[0]
         constructor_fn_name = constructor_fn_name.strip()
         assert len(constructor_fn_name) >= 0
         assert RE_IS_ID.match(constructor_fn_name), constructor_fn_name
+        return constructor_fn_name
+    else:
+        return None
 
-    debug_directive_name = directive.__class__.__name__
-    absolute_name = get_absolute_name_of_class_of_node(node)
+
+def construct_hwt_obj(absolute_name, constructor_fn_name, allowed_classes, debug_directive_name):
     if constructor_fn_name is None:
         unitCls = generic_import(absolute_name)
         if not issubclass(unitCls, allowed_classes):
@@ -103,6 +92,26 @@ def get_instance_from_directive_node(directive: Directive, allowed_classes):
     return u
 
 
+def get_instance_from_directive_node(directive: Directive, allowed_classes):
+    '''
+    Converts
+
+    .. code-block:: Python
+        """
+        .. directive:
+        .. directive: constructor_fn_name
+        """
+
+    to instance, if constructor_fn_name is not specified the current class instantiated.
+    '''
+
+    node = directive.state
+    debug_directive_name = directive.__class__.__name__
+    constructor_fn_name = get_constructor_name(directive)
+    absolute_name = get_absolute_name_of_class_of_node(node)
+    return construct_hwt_obj(absolute_name, constructor_fn_name, allowed_classes, debug_directive_name)
+
+
 def merge_variable_lists_into_hwt_objs(app: Sphinx, domain: str, objtype: str, contentnode: nodes.Element, hwt_objs_cls) -> None:
     """
     Move doc from variable lists in class documentation to HDL param list if the variable is a HDL Param instance.
@@ -124,8 +133,8 @@ def merge_variable_lists_into_hwt_objs(app: Sphinx, domain: str, objtype: str, c
 
 
 def merge_field_lists_to_hdl_objs(field_list: nodes.field_list, hwt_obj_list: hwt_objs):
-    obj_names = set(o[0] for o in hwt_obj_list.obj_list)
-    extra_doc = hwt_obj_list.extra_doc
+    obj_names = set(o[0] for o in hwt_obj_list["obj_list"])
+    extra_doc = hwt_obj_list["extra_doc"]
     to_remove = []
     for field in list(field_list):
         field_name = field[0].astext()

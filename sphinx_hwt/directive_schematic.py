@@ -4,7 +4,9 @@ import json
 import logging
 from os import path, makedirs
 from shutil import copytree, rmtree
+from sphinx.application import Sphinx
 from sphinx.locale import _
+from typing import Optional
 
 from hwt.synthesizer.unit import Unit
 from hwt.synthesizer.utils import synthesised
@@ -13,8 +15,7 @@ from hwtGraph.elk.fromHwt.convertor import UnitToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
-    get_instance_from_directive_node
-from sphinx.application import Sphinx
+    get_constructor_name, construct_hwt_obj
 
 
 class SchematicPaths():
@@ -58,12 +59,12 @@ class SchematicPaths():
 
 class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
 
-    def __init__(self, unit_instance: Unit, *args, **kwargs):
+    def __init__(self, constructor_fn_name: Optional[str], *args, **kwargs):
         """
-        :param constructor_fn: optional name of explicit constructor function
+        :param constructor_fn_name: optional name of explicit constructor function
         """
         super(SchematicLink, self).__init__(*args, **kwargs)
-        self.unit_instance = unit_instance
+        self["constructor_fn_name"] = constructor_fn_name
 
     @staticmethod
     def visit_html(self, node):
@@ -71,13 +72,14 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
         Generate html elements and schematic json
         """
         absolute_name = get_absolute_name_of_class_of_node(node)
+        constructor_fn_name = node["constructor_fn_name"]
         serialno = node["serialno"]
 
         try:
             schem_file = SchematicPaths.get_sch_file_name_absolute(
                 self.document, absolute_name, serialno)
             makedirs(path.dirname(schem_file), exist_ok=True)
-            u = node.unit_instance
+            u = construct_hwt_obj(absolute_name, constructor_fn_name, Unit, "hwt-schematic")
             with open(schem_file, "w") as f:
                 synthesised(u, DEFAULT_PLATFORM)
                 g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
@@ -128,18 +130,10 @@ class HwtSchematicDirective(Directive):
         # build dir path
         # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
         self.copy_extra_static_files()
-
-        try:
-            u = get_instance_from_directive_node(self, Unit)
-        except Exception as e:
-            logging.error(e, exc_info=True)
-            absolute_name = get_absolute_name_of_class_of_node(self.state)
-            raise Exception(
-                "Error  occured while processing of %s" % absolute_name)
-
+        constructor_fn_name = get_constructor_name(self)
         env = self.state.document.settings.env
         serialno = env.new_serialno('SchematicLink')
-        schema_node = SchematicLink(unit_instance=u,
+        schema_node = SchematicLink(constructor_fn_name=constructor_fn_name,
                                     serialno=serialno)
 
         self.state.nested_parse(self.content,
@@ -147,6 +141,7 @@ class HwtSchematicDirective(Directive):
                                 schema_node)
 
         return [schema_node, ]
+
 
 def setup(app: Sphinx):
     app.add_node(SchematicLink,

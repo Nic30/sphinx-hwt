@@ -13,6 +13,8 @@ from sphinx_hwt.directive_schematic import HwtSchematicDirective
 class HwtAutodocDirective(HwtSchematicDirective):
 
     def run(self):
+        "Can not use multiple hwt-autodoc/hwt-schematic/hwt-params/hwt-interfaces in a single class"
+
         try:
             u = get_instance_from_directive_node(self, (Interface, Unit))
         except Exception as e:

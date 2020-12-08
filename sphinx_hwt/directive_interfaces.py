@@ -22,7 +22,9 @@ class hwt_interfaces(hwt_objs):
         """
         Generate html elements and schematic json
         """
-        if not node.obj_list:
+        extra_doc = node["extra_doc"]
+        obj_list = node["obj_list"]
+        if not obj_list:
             return
 
         field_list = nodes.field_list()
@@ -30,7 +32,7 @@ class hwt_interfaces(hwt_objs):
 
         params_list = nodes.bullet_list()
         of_type = _('of type')
-        for name, type_str, v in sorted(node.obj_list, key=lambda x: x[0]):
+        for name, type_str, v in sorted(obj_list, key=lambda x: x[0]):
             assert v is None
             i_p = nodes.paragraph()
             i_p += nodes.strong(name, name)
@@ -38,7 +40,7 @@ class hwt_interfaces(hwt_objs):
             annotation = f" - {of_type} {type_str}\n"
             i_p += nodes.Text(annotation)
 
-            extra = node.extra_doc.get(name, None)
+            extra = extra_doc.get(name, None)
             if extra:
                 i_p += extra
 
