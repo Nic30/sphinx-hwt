@@ -14,7 +14,7 @@ from ipCorePackager.constants import INTF_DIRECTION, DIRECTION
 
 class hwt_interfaces(hwt_objs):
     """
-    A directive which adds a list of HDL defined interfaces for Unit innstances
+    A directive which adds a list of HDL defined interfaces for Unit instances
     The message also contains information about default value and type of the parameter.
     """
 
@@ -33,8 +33,7 @@ class hwt_interfaces(hwt_objs):
 
         params_list = nodes.bullet_list()
         of_type = _('of type')
-        for name, type_str, v in sorted(obj_list, key=lambda x: x[0]):
-            assert v is None
+        for name, type_str in sorted(obj_list, key=lambda x: x[0]):
             i_p = nodes.paragraph()
             i_p += nodes.strong(name, name)
 
@@ -84,7 +83,7 @@ class HwtInterfacesDirective(Directive):
             if i._masterDir != DIRECTION.OUT:
                 t = f"{t} (Master={i._masterDir.name})"
 
-            interfaces_serialized.append((name, t, None))
+            interfaces_serialized.append((name, t))
 
         interfaces = hwt_interfaces(interfaces_serialized)
 

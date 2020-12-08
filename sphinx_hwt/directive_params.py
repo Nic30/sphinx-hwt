@@ -14,7 +14,7 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
 
 class hwt_params(hwt_objs):
     """
-    A directive which adds a list of defined HDL parameters for Unit innstances
+    A directive which adds a list of defined HDL parameters for Unit instances
     The message also contains information about default value and type of the parameter.
     """
 
