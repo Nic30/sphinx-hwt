@@ -30,7 +30,7 @@
         }
         var width = viewport().width,
             height = viewport().height;
-        
+
         var svg = d3.select("#scheme-placeholder")
           .attr("width", width)
           .attr("height", height);
@@ -51,7 +51,7 @@
         	hwSchematic.root.attr("transform", ev.transform)
         });
 
-        // disable zoom on doubleclick 
+        // disable zoom on doubleclick
         // because it interferes with component expanding/collapsing
         svg.call(zoom)
            .on("dblclick.zoom", null)
@@ -70,16 +70,24 @@
         }
 
         var schematic_url = getParameterByName("schematic");
-        if (schematic_url == null)
-        	throw Error("schematic url was not specified");
-
+        if (schematic_url == null) {
+            var reason = "schematic url was not specified";
+            svg.append("text")
+                  .text(reason);
+        	throw Error(reason);
+        }
         d3.json(schematic_url)
           .then(function(graph) {
-              if (graph.hwt && graph.hwt.name)
-                  document.title = graph.hwt.name;
+              if (graph.hwMeta && graph.hwMeta.name)
+                  document.title = graph.hwMeta.name;
               // load the data and render the elements
               hwSchematic.bindData(graph);
+           }, function(reason) {
+               svg.append("text")
+                  .text(reason);
+               throw Error(reason);
            });
+
     </script>
 </body>
 </html>
