@@ -69,8 +69,8 @@ def construct_hwt_obj(absolute_name, constructor_fn_name, allowed_classes, debug
         unitCls = generic_import(absolute_name)
         if not issubclass(unitCls, allowed_classes):
             raise AssertionError(
-                "Can not use %s sphinx directive"
-                " for %s because it is not subclass of %r" % (debug_directive_name, absolute_name, allowed_classes))
+                f"Can not use {debug_directive_name:s} sphinx directive"
+                f" for {absolute_name:s} because it is not subclass of {allowed_classes}")
         u = unitCls()
     else:
         assert len(constructor_fn_name) > 0 and RE_IS_ID.match(constructor_fn_name), constructor_fn_name
@@ -85,9 +85,8 @@ def construct_hwt_obj(absolute_name, constructor_fn_name, allowed_classes, debug
         u = constructor_fn()
         if not isinstance(u, allowed_classes):
             raise AssertionError(
-                "Can not use %s sphinx directive"
-                " with %s because function did not returned instance of %r, (returned %r)" % (debug_directive_name,
-                    _absolute_name, allowed_classes, u))
+                f"Can not use {debug_directive_name:s} sphinx directive"
+                f" with {_absolute_name:s} because function did not returned instance of {allowed_classes}, (returned {u} of class {u.__class__})")
 
     return u
 

@@ -22,7 +22,7 @@ class HwtAutodocDirective(HwtSchematicDirective):
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)
             raise Exception(
-                "Error  occured while processing of %s" % absolute_name)
+                f"Error occured while processing of {absolute_name:s}")
 
         params = HwtParamsDirective.run(self)
         interfaces = HwtInterfacesDirective.run(self)

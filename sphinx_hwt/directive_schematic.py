@@ -99,7 +99,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
         except Exception as e:
             logging.error(e, exc_info=True)
             raise Exception(
-                "Error  occured while processing of %s" % absolute_name)
+                f"Error occured while processing of {absolute_name:s}")
 
     @staticmethod
     def depart_html(self, node):

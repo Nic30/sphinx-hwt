@@ -69,7 +69,7 @@ class HwtInterfacesDirective(Directive):
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)
             raise Exception(
-                "Error  occured while processing of %s" % absolute_name)
+                f"Error occured while processing of {absolute_name:s}")
 
         interfaces_serialized = []
         for i in u._interfaces:
