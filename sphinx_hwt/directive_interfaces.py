@@ -3,12 +3,12 @@ from docutils.parsers.rst import Directive
 import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
-from sphinx.util import typing
 
 from hwt.synthesizer.interface import Interface
 from hwt.synthesizer.unit import Unit
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, hwt_objs, merge_variable_lists_into_hwt_objs, \
-    get_instance_from_directive_node
+    get_instance_from_directive_node, construct_property_description_list, \
+    ref_to_class
 from ipCorePackager.constants import INTF_DIRECTION, DIRECTION
 
 
@@ -20,36 +20,7 @@ class hwt_interfaces(hwt_objs):
 
     @staticmethod
     def visit_html(self, node: "hwt_interfaces"):
-        """
-        Generate html elements and schematic json
-        """
-        extra_doc = node["extra_doc"]
-        obj_list = node["obj_list"]
-        if not obj_list:
-            return
-
-        field_list = nodes.field_list()
-        node += field_list
-
-        params_list = nodes.bullet_list()
-        of_type = _('of type')
-        for name, type_str in sorted(obj_list, key=lambda x: x[0]):
-            i_p = nodes.paragraph()
-            i_p += nodes.strong(name, name)
-
-            annotation = f" - {of_type} {type_str}\n"
-            i_p += nodes.Text(annotation)
-
-            extra = extra_doc.get(name, None)
-            if extra:
-                i_p += extra
-
-            params_list += nodes.list_item('', i_p)
-
-        params_desc = nodes.field()
-        params_desc += nodes.field_name(_('HDL IO'), _('HDL IO'))
-        field_list += params_desc
-        field_list += nodes.field_body('', params_list)
+        pass
 
     @staticmethod
     def depart_html(self, node: "hwt_interfaces"):
@@ -70,26 +41,42 @@ class HwtInterfacesDirective(Directive):
             logging.error(e, exc_info=True)
             raise Exception(
                 f"Error occured while processing of {absolute_name:s}")
+        if not u._interfaces:
+            return []
 
-        interfaces_serialized = []
+        description_group_list, obj_list = construct_property_description_list('HDL IO')
+        of_type = _('of type')
+        intf_name_to_descr_paragraph = {}
         for i in u._interfaces:
             name = i._name
+
+            i_p = nodes.paragraph()
+            i_p += nodes.strong(name, name)
+
+            i_p += nodes.Text(f" - {of_type} ")
+
+            t = [ref_to_class(i.__class__), ]
             dt = getattr(i, "_dtype", None)
-            t = typing.stringify(i.__class__)
             if dt is not None:
-                t = f"{t} with dtype={dt}"
+                t.append(nodes.Text(f" with dtype={dt}"))
+
             d = INTF_DIRECTION.opposite(i._direction)
-            t = f"{t} - {d.name}"
+            t.append(nodes.Text(f" - {d.name} "))
             if i._masterDir != DIRECTION.OUT:
-                t = f"{t} (Master={i._masterDir.name})"
+                t.append(nodes.Text(f"(Master={i._masterDir.name}) "))
 
-            interfaces_serialized.append((name, t))
+            i_p.extend(t)
 
-        interfaces = hwt_interfaces(interfaces_serialized)
+            obj_list += nodes.list_item('', i_p)
+            intf_name_to_descr_paragraph[name] = i_p
+
+        interfaces = hwt_interfaces(intf_name_to_descr_paragraph)
+        interfaces += description_group_list
 
         self.state.nested_parse(self.content,
                     self.content_offset,
                     interfaces)
+
         return [interfaces, ]
 
 

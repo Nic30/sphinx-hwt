@@ -3,13 +3,12 @@ from docutils.parsers.rst import Directive
 import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
-from sphinx.util import typing
-
 from hwt.synthesizer.interface import Interface
 from hwt.synthesizer.unit import Unit
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     hwt_objs, merge_variable_lists_into_hwt_objs, \
-    get_instance_from_directive_node
+    get_instance_from_directive_node, construct_property_description_list, \
+    ref_to_class
 
 
 class hwt_params(hwt_objs):
@@ -20,36 +19,7 @@ class hwt_params(hwt_objs):
 
     @staticmethod
     def visit_html(self, node: "hwt_params"):
-        """
-        Generate html elements and schematic json
-        """
-        extra_doc = node["extra_doc"]
-        obj_list = node["obj_list"]
-
-        if not obj_list:
-            return
-
-        field_list = nodes.field_list()
-        node += field_list
-
-        params_list = nodes.bullet_list()
-        def_val = _('default value')
-        of_type = _('of type')
-        for name, t, v in sorted(obj_list, key=lambda x: x[0]):
-            p_p = nodes.paragraph()
-            p_p += nodes.strong(name, name)
-            annotation = f" - {def_val} {v} {of_type} {t}\n"
-            p_p += nodes.Text(annotation)
-            extra = extra_doc.get(name, None)
-            if extra:
-                p_p += extra
-
-            params_list += nodes.list_item('', p_p)
-
-        params_desc = nodes.field()
-        params_desc += nodes.field_name(_('HDL params'), _('HDL params'))
-        field_list += params_desc
-        field_list += nodes.field_body('', params_list)
+        pass
 
     @staticmethod
     def depart_html(self, node: "hwt_params"):
@@ -70,19 +40,33 @@ class HwtParamsDirective(Directive):
             raise Exception(
                 f"Error occured while processing of {absolute_name:s}")
 
-        params_serialized = []
+        if not u._params:
+            return []
+
+        description_group_list, obj_list = construct_property_description_list('HDL params')
+        def_val = _('default value')
+        of_type = _('of type')
+        name_to_descr_paragraph = {}
         for p in u._params:
             name = p._name
             v = p.get_value()
             t = getattr(v, "_dtype", None)
             if t is None:
-                t = v.__class__
-                t = typing.stringify(t)
+                t = ref_to_class(v.__class__)
             else:
-                t = repr(t)
-            params_serialized.append((name, t, repr(v)))
+                t = nodes.Text(repr(t))
 
-        params = hwt_params(params_serialized)
+            descr_p = nodes.paragraph()
+            descr_p += nodes.strong(name, name)
+            descr_p += nodes.Text(f" - {def_val} {v} {of_type}")
+            descr_p += t
+
+            obj_list += nodes.list_item('', descr_p)
+
+            name_to_descr_paragraph[name] = descr_p
+
+        params = hwt_params(name_to_descr_paragraph)
+        params += description_group_list
 
         self.state.nested_parse(self.content,
                     self.content_offset,

@@ -3,14 +3,14 @@ from docutils.parsers.rst import Directive
 import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
-from sphinx.util import typing
 
 from hwt.synthesizer.unit import Unit
 from hwt.synthesizer.utils import synthesised
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     hwt_objs, merge_variable_lists_into_hwt_objs, \
-    get_instance_from_directive_node
+    get_instance_from_directive_node, construct_property_description_list,\
+    ref_to_class
 
 
 class hwt_components(hwt_objs):
@@ -21,35 +21,8 @@ class hwt_components(hwt_objs):
 
     @staticmethod
     def visit_html(self, node: "hwt_components"):
-        """
-        Generate html elements and schematic json
-        """
-        extra_doc = node["extra_doc"]
-        obj_list = node["obj_list"]
+        pass
 
-        if not obj_list:
-            return
-
-        field_list = nodes.field_list()
-        node += field_list
-
-        params_list = nodes.bullet_list()
-        of_type = _('of type')
-        for name, t in sorted(obj_list, key=lambda x: x[0]):
-            p_p = nodes.paragraph()
-            p_p += nodes.strong(name, name)
-            annotation = f" - {of_type} {t}\n"
-            p_p += nodes.Text(annotation)
-            extra = extra_doc.get(name, None)
-            if extra:
-                p_p += extra
-
-            params_list += nodes.list_item('', p_p)
-
-        params_desc = nodes.field()
-        params_desc += nodes.field_name(_('HDL components'), _('HDL components'))
-        field_list += params_desc
-        field_list += nodes.field_body('', params_list)
 
     @staticmethod
     def depart_html(self, node: "hwt_components"):
@@ -71,13 +44,24 @@ class HwtComponentsDirective(Directive):
             raise Exception(
                 f"Error occured while processing of {absolute_name:s}")
 
-        components_serialized = []
+        if not u._units:
+            return []
+
+        description_group_list, obj_list = construct_property_description_list('HDL components')
+        name_to_descr_paragraph = {}
+        of_type = _('of type')
         for p in u._units:
             name = p._name
-            t = typing.stringify(p.__class__)
-            components_serialized.append((name, t))
 
-        components = hwt_components(components_serialized)
+            p_p = nodes.paragraph()
+            p_p += nodes.strong(name, name)
+            p_p += nodes.Text(f" - {of_type} ")
+            p_p += ref_to_class(p.__class__)
+            obj_list += nodes.list_item('', p_p)
+            name_to_descr_paragraph[name] = p_p
+
+        components = hwt_components(name_to_descr_paragraph)
+        components += description_group_list
 
         self.state.nested_parse(self.content,
                     self.content_offset,

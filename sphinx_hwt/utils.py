@@ -1,16 +1,20 @@
 from docutils import nodes
 from docutils.parsers.rst import Directive
 import re
-from sphinx.addnodes import desc_signature
+from sphinx.addnodes import desc_signature, pending_xref
 from sphinx.application import Sphinx
-from typing import Union, List, Optional, Dict
-
+from sphinx.locale import _
+from sphinx.util import typing
+from typing import Union, List, Dict
 
 RE_IS_ID = re.compile("\w+")
 
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
 def generic_import(name: Union[str, List[str]]):
+    """
+    Import using string or list of module names
+    """
     if isinstance(name, str):
         components = name.split('.')
     else:
@@ -25,6 +29,9 @@ def generic_import(name: Union[str, List[str]]):
 
 
 def get_absolute_name_of_class_of_node(node):
+    """
+    Get a module path for an object from its node in doc.
+    """
     parentClsNode = node.parent.parent
     assert parentClsNode.attributes['objtype'] == 'class', \
         (parentClsNode.attributes['objtype'], parentClsNode)
@@ -44,15 +51,15 @@ class hwt_objs(nodes.General, nodes.Element):
     :ivar obj_list: format (name, type_str, value_str)
     """
 
-    def __init__(self, obj_list: list, extra_param_doc: Optional[Dict[str, List[nodes.Element]]]=None, rawsource='', *children, **attributes):
+    def __init__(self, obj_name_to_descr_paragraph: Dict[str, nodes.Element], rawsource='', *children, **attributes):
         super(hwt_objs, self).__init__(rawsource, *children, **attributes)
-        if extra_param_doc is None:
-            extra_param_doc = {}
-        self["extra_doc"] = extra_param_doc
-        self["obj_list"] = obj_list
+        self["obj_name_to_descr_paragraph"] = obj_name_to_descr_paragraph
 
 
 def get_constructor_name(directive: Directive):
+    """
+    Get a first argument of the directive and check if it is a function.
+    """
     if directive.arguments:
         assert len(directive.arguments) == 1, directive.arguments
         constructor_fn_name = directive.arguments[0]
@@ -64,7 +71,7 @@ def get_constructor_name(directive: Directive):
         return None
 
 
-def construct_hwt_obj(absolute_name, constructor_fn_name, allowed_classes, debug_directive_name):
+def construct_hwt_obj(absolute_name: str, constructor_fn_name: str, allowed_classes, debug_directive_name: str):
     if constructor_fn_name is None:
         unitCls = generic_import(absolute_name)
         if not issubclass(unitCls, allowed_classes):
@@ -132,8 +139,7 @@ def merge_variable_lists_into_hwt_objs(app: Sphinx, domain: str, objtype: str, c
 
 
 def merge_field_lists_to_hdl_objs(field_list: nodes.field_list, hwt_obj_list: hwt_objs):
-    obj_names = set(o[0] for o in hwt_obj_list["obj_list"])
-    extra_doc = hwt_obj_list["extra_doc"]
+    obj_name_to_descr_paragraph = hwt_obj_list["obj_name_to_descr_paragraph"]
     to_remove = []
     for field in list(field_list):
         field_name = field[0].astext()
@@ -142,33 +148,58 @@ def merge_field_lists_to_hdl_objs(field_list: nodes.field_list, hwt_obj_list: hw
             if len(parts) == 2:
                 # :ivar xxx:
                 name = parts[1]
-                if name not in obj_names:
-                    continue  # regular variable (not HDL Param instance)
-                extra = extra_doc.setdefault(name, [])
+                doc_paragraph = obj_name_to_descr_paragraph.get(name, None)
+                if doc_paragraph is None:
+                    continue  # regular variable (not HDL obj instance)
                 # children of the paragraph with the doc
-                extra += field[1][0].children
+                doc_paragraph += field[1][0].children
 
             elif len(parts) > 2:
                 # :ivar xxx yyy:
                 name = ' '.join(parts[2:])
-                if name not in obj_names:
-                    continue  # regular variable (not HDL Param instance)
-                extra = extra_doc.setdefault(name, [])
+                doc_paragraph = obj_name_to_descr_paragraph.get(name, None)
+                if doc_paragraph is None:
+                    continue  # regular variable (not HDL obj instance)
                 # children of the paragraph with the doc
-                extra += field[1][0].children
+                doc_paragraph += field[1][0].children
 
             else:
                 raise NotImplementedError("Unknon format of ivar", parts)
 
         elif parts[0] == 'type':
             name = parts[1]
-            if name not in obj_names:
-                continue  # regular variable (not HDL Param instance)
-            extra = extra_doc.setdefault(name, [])
+            doc_paragraph = obj_name_to_descr_paragraph.get(name, None)
+            if doc_paragraph is None:
+                continue  # regular variable (not HDL obj instance)
             # children of the paragraph with the doc
-            extra += field[1][0].children
+            doc_paragraph += field[1][0].children
 
         to_remove.append(field)
 
     for field in to_remove:
         field.replace_self([])
+
+
+def construct_property_description_list(name):
+    """
+    Construct a skeleton for sphinx member description block
+    """
+    description_group_list = nodes.field_list()
+    obj_desc = nodes.field()
+    obj_desc += nodes.field_name(_(name), _(name))
+    description_group_list += obj_desc
+
+    obj_list = nodes.bullet_list()
+    description_group_list += nodes.field_body('', obj_list)
+    return description_group_list, obj_list
+
+
+def ref_to_class(class_obj):
+    """
+    Create the sphinx pending_xref for a class
+    """
+    class_path = typing.stringify(class_obj)
+    t_ref = pending_xref(refdomain='py', reftype='class', reftarget=class_path)
+    t_ref += nodes.Text(class_path)
+    return t_ref
+
