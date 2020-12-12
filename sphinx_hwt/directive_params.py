@@ -58,7 +58,7 @@ class HwtParamsDirective(Directive):
 
             descr_p = nodes.paragraph()
             descr_p += nodes.strong(name, name)
-            descr_p += nodes.Text(f" - {def_val} {v} {of_type}")
+            descr_p += nodes.Text(f" - {def_val} {v} {of_type} ")
             descr_p += t
 
             obj_list += nodes.list_item('', descr_p)
