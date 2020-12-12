@@ -44,6 +44,7 @@ class HwtInterfacesDirective(Directive):
         if not u._interfaces:
             return []
 
+        is_Unit = isinstance(u, Unit)
         description_group_list, obj_list = construct_property_description_list('HDL IO')
         of_type = _('of type')
         intf_name_to_descr_paragraph = {}
@@ -60,7 +61,10 @@ class HwtInterfacesDirective(Directive):
             if dt is not None:
                 t.append(nodes.Text(f" with dtype={dt}"))
 
-            d = INTF_DIRECTION.opposite(i._direction)
+            d = i._direction
+            if is_Unit:
+                d = INTF_DIRECTION.opposite(d)
+
             t.append(nodes.Text(f" - {d.name} "))
             if i._masterDir != DIRECTION.OUT:
                 t.append(nodes.Text(f"(Master={i._masterDir.name}) "))
