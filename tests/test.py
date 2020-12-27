@@ -4,7 +4,7 @@ import os
 from os.path import isfile, join
 import unittest
 
-from sphinx_hwt.tests.utils import cwd, run_test
+from tests.utils import cwd, run_test
 
 
 class HwtSchematic_directive_TC(unittest.TestCase):
