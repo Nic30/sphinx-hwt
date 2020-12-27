@@ -7,12 +7,12 @@ cache:
 python:
 - '3.8'
 install:
-- pip install pytest coveralls
-- pip install -r .travis/requirements.hwtGraph.txt
+- pip install coveralls
+- pip install -r .circleci/requirements.hwtGraph.txt
 - python setup.py install
 - rm -r node_modules
 script:
-- coverage run --source=sphinx_hwt setup.py test
+- coverage run --source=sphinx_hwt -m tests.test
 deploy:
   provider: pypi
   user: nic30
