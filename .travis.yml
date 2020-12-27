@@ -8,7 +8,7 @@ python:
 - '3.8'
 install:
 - pip install coveralls
-- pip install -r .circleci/requirements.hwtGraph.txt
+- pip install -r doc/requirements.txt
 - python setup.py install
 - rm -r node_modules
 script:
