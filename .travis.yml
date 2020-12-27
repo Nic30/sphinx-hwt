@@ -12,7 +12,7 @@ install:
 - python setup.py install
 - rm -r node_modules
 script:
-- coverage run --source=sphinx_hwt -m tests.test
+- coverage run --source=sphinx_hwt -m tests.all
 deploy:
   provider: pypi
   user: nic30
