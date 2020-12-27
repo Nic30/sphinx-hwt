@@ -23,12 +23,7 @@ for tc in TCs:
 if __name__ == "__main__":
     import sys
 
-    if "--with-xunit" in sys.argv:
-        # junit xml output for CI
-        import xmlrunner
-        runner = xmlrunner.XMLTestRunner(output='test-reports')
-    else:
-        runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner(verbosity=2)
 
     try:
         from concurrencytest import ConcurrentTestSuite, fork_for_tests
