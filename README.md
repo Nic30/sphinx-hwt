@@ -1,6 +1,8 @@
 # sphinx-hwt
-
-[![Travis-ci Build Status](https://travis-ci.org/Nic30/sphinx-hwt.png?branch=master)](https://travis-ci.org/Nic30/sphinx-hwt)[![PyPI version](https://badge.fury.io/py/sphinx-hwt.svg)](http://badge.fury.io/py/sphinx-hwt)[![Coverage Status](https://coveralls.io/repos/github/Nic30/sphinx-hwt/badge.svg?branch=master)](https://coveralls.io/github/Nic30/sphinx-hwt?branch=master)[![Documentation Status](https://readthedocs.org/projects/sphinx-hwt/badge/?version=latest)](http://sphinx-hwt.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/Nic30/sphinx-hwt.svg?style=svg)](https://circleci.com/gh/Nic30/sphinx-hwt)
+[![PyPI version](https://badge.fury.io/py/sphinx-hwt.svg)](http://badge.fury.io/py/sphinx-hwt)
+[![Coverage Status](https://coveralls.io/repos/github/Nic30/sphinx-hwt/badge.svg?branch=master)](https://coveralls.io/github/Nic30/sphinx-hwt?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/sphinx-hwt/badge/?version=latest)](http://sphinx-hwt.readthedocs.io/en/latest/?badge=latest)
 [![Python version](https://img.shields.io/pypi/pyversions/sphinx-hwt.svg)](https://img.shields.io/pypi/pyversions/sphinx-hwt.svg)
 
 Extension for Sphinx document generator. Add automatically generated schemes and other visual documentation of hardware.
