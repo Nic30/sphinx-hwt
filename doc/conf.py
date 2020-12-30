@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'pyMathBitPrecise'
+project = 'sphinx-hwt'
 copyright = '2017-%d, Michal Orsak' % datetime.now().year
 author = 'Michal Orsak'
 
@@ -63,4 +63,4 @@ for file in glob.glob("*.rst"):
 
 
 apidoc_main(["--module-first", "--full", "--maxdepth", "-1",
-             "--output-dir", "../doc", "../pyMathBitPrecise"])
+             "--output-dir", "../doc", "../sphinx_hwt"])
