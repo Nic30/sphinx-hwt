@@ -61,3 +61,7 @@ class ExampleCls0(Unit):
     * schematic rendered by [d3-hwschematic library](https://github.com/Nic30/d3-hwschematic)
     * Unit instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
 * hwt-autodoc: hwt-params, hwt-interface, hwt-components and hwt-schematic at once
+
+
+## Similar software
+* [symbolator](https://github.com/kevinpt/symbolator) - Python, hdl component symbol generator also for sphinx
