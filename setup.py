@@ -11,9 +11,8 @@ from setuptools import find_packages, setup, Command
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from shutil import copyfile
 from shutil import rmtree
-from subprocess import check_call
+from subprocess import check_call, check_output
 import sys
-
 
 TOP_DIR = dirname(abspath(__file__))
 
@@ -27,9 +26,16 @@ JS_FILES = [
 
 def npm_installation_check():
     try:
-        check_call(["npm", "--version"])
+        v = check_output(["npm", "--version"])
+        v = v.split(".")
+        needs_update = int(v[0]) < 6
     except Exception:
         return False
+
+    if needs_update:
+        print("Minimal npm version (6) not meet trying update")
+        check_call(["npm", "install", "npm"])
+
     return True
 
 
