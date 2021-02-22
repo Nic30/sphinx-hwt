@@ -27,11 +27,11 @@ JS_FILES = [
 def npm_installation_check():
     try:
         v = check_output(["npm", "--version"])
-        v = v.split(".")
-        needs_update = int(v[0]) < 6
     except Exception:
         return False
 
+    v = v.split(".")
+    needs_update = int(v[0]) < 6
     if needs_update:
         print("Minimal npm version (6) not meet trying update")
         check_call(["npm", "install", "npm"])
