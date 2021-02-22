@@ -30,7 +30,7 @@ def npm_installation_check():
     except Exception:
         return False
 
-    v = v.split(".")
+    v = v.decode().split(".")
     needs_update = int(v[0]) < 6
     if needs_update:
         print("Minimal npm version (6) not meet trying update")
