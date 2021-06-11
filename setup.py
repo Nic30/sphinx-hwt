@@ -141,7 +141,7 @@ setup(
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     install_requires=[
-        'sphinx>=3.2.1',  # base sphinx doc generator
+        'sphinx>=4.0.2',  # base sphinx doc generator
         'hwtGraph>=1.9',  # converts HWT Units to schematics
     ],
     classifiers=[
