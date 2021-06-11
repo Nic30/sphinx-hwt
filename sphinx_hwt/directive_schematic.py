@@ -85,6 +85,7 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
                 g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
                 idStore = ElkIdStore()
                 data = g.toElkJson(idStore)
+                print("writing ", f)
                 json.dump(data, f)
 
             viewer = SchematicPaths.get_sch_viewer_link(self.document)
