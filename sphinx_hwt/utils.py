@@ -103,10 +103,8 @@ def get_instance_from_directive_node(directive: Directive, allowed_classes):
     Converts
 
     .. code-block:: Python
-        """
         .. directive:
         .. directive: constructor_fn_name
-        """
 
     to instance, if constructor_fn_name is not specified the current class instantiated.
     '''
