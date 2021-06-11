@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -- General configuration ------------------------------------------------
+from os import makedirs
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -156,3 +157,4 @@ epub_copyright = copyright
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
+makedirs("_static", exist_ok=True)
