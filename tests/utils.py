@@ -48,9 +48,9 @@ def run_test(test_name, mock_stdout=False, mock_stderr=False):
     """
     test_path = path.join(cwd, test_name)
     try:
+        sys.path.append(path.abspath(test_path))
         os.chdir(test_path)
         # allow test modules import
-        sys.path.append(".")
 
         stderr = sys.stderr
         if mock_stderr:
