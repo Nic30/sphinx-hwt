@@ -7,6 +7,7 @@ from sphinx.ext.apidoc import main as apidoc_main
 import sys
 from types import ModuleType
 from unittest.mock import patch
+from copy import deepcopy
 
 cwd = os.path.dirname(path.realpath(__file__))
 
@@ -47,8 +48,9 @@ def run_test(test_name, mock_stdout=False, mock_stderr=False):
     Build documentation in specified test folder
     """
     test_path = path.join(cwd, test_name)
+    original_path = deepcopy(sys.path)
     try:
-        sys.path.append(path.abspath(test_path))
+        sys.path.insert(0, path.abspath(test_path))
         os.chdir(test_path)
         # allow test modules import
 
@@ -73,10 +75,11 @@ def run_test(test_name, mock_stdout=False, mock_stderr=False):
             sys.stderr.flush()
 
         os.chdir(cwd)
-        sys.path.pop()
+        sys.path.clear()
+        sys.path.extend(original_path)
         for name, m in list(sys.modules.items()):
             if isinstance(m, ModuleType) \
                     and hasattr(m, "__file__") \
                     and m.__file__ is not None \
-                    and m.__file__.startswith("./"):
+                    and m.__file__.startswith(test_path):
                 del sys.modules[name]
