@@ -102,7 +102,8 @@ def get_instance_from_directive_node(directive: Directive, allowed_classes):
     '''
     Converts
 
-    .. code-block:: Python
+    .. code-block:: text
+
         .. directive:
         .. directive: constructor_fn_name
 
