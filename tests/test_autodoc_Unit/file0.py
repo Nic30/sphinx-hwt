@@ -5,6 +5,8 @@ from hwt.synthesizer.param import Param
 
 class ExampleCls0(Unit):
     """
+    SOMETHING
+
     Some text before
 
     .. hwt-autodoc::
