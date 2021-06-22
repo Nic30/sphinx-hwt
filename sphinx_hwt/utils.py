@@ -21,7 +21,13 @@ def generic_import(name: Union[str, List[str]]):
         assert isinstance(name, list), name
         components = name
 
-    mod = __import__(components[0])
+    mod = None
+    for i, comp in enumerate(components[1:]):
+        try:
+            mod = __import__('.'.join(components[:i + 2]))
+        except ModuleNotFoundError:
+            break
+
     for comp in components[1:]:
         mod = getattr(mod, comp)
 
