@@ -22,15 +22,16 @@ def generic_import(name: Union[str, List[str]]):
         components = name
 
     mod = None
-    for i, comp in enumerate(components[1:]):
+    for i, comp in enumerate(components):
         try:
-            mod = __import__('.'.join(components[:i + 2]))
+            # if imported sucessfully __import__ returns a top module
+            mod = __import__('.'.join(components[:i + 1]))
         except ModuleNotFoundError:
-            break
-
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-
+            for comp in components[1:]:
+                try:
+                    mod = getattr(mod, comp)
+                except AttributeError:
+                    raise
     return mod
 
 
