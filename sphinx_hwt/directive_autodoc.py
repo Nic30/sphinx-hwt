@@ -1,6 +1,5 @@
 import logging
 from sphinx.application import Sphinx
-
 from hwt.synthesizer.interface import Interface
 from hwt.synthesizer.unit import Unit
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
@@ -9,6 +8,7 @@ from sphinx_hwt.directive_params import HwtParamsDirective
 from sphinx_hwt.directive_interfaces import HwtInterfacesDirective
 from sphinx_hwt.directive_schematic import HwtSchematicDirective
 from sphinx_hwt.directive_components import HwtComponentsDirective
+from sphinx_hwt.directive_buildReport import HwtBuildreportDirective
 
 
 class HwtAutodocDirective(HwtSchematicDirective):
@@ -30,11 +30,16 @@ class HwtAutodocDirective(HwtSchematicDirective):
         if isinstance(u, Unit):
             components = HwtComponentsDirective.run(self)
             schemes = HwtSchematicDirective.run(self)
-            return [*params, *interfaces, *components, *schemes]
+            build_report = HwtBuildreportDirective(
+                self.name, self.arguments,
+                self.options, self.content,
+                self.lineno, self.content_offset,
+                self.block_text, self.state,
+                self.state_machine).run()
+            return [*params, *interfaces, *components, *schemes, *build_report]
         else:
             return [*params, *interfaces]
 
 
 def setup(app: Sphinx):
     app.add_directive('hwt-autodoc', HwtAutodocDirective)
-

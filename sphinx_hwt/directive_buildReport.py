@@ -1,3 +1,5 @@
+from posixpath import dirname
+from shutil import copyfile
 from os import path, makedirs
 from docutils import nodes
 from typing import Optional
@@ -12,43 +14,84 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     get_instance_from_directive_node, construct_property_description_list, \
     ref_to_class, construct_hwt_obj
 from sphinx_hwt.directive_schematic import SchematicLink, SchematicPaths
+import sqlite3
 
-# TableExample, self
+
+class BuildReportPath():
+
+    SQLICON_PATH = path.join(path.dirname(__file__), "html", "sql.png")
+
+    @classmethod
+    def get_sql_icon_name_absolute(cls, document):
+        return path.join(document.settings.env.app.builder.outdir, cls.get_static_path(document), "sql.png")
+
+    @classmethod
+    def get_static_path(cls, document):
+        static_paths = document.settings.env.config.html_static_path
+        if not static_paths:
+            return "_static"
+        return static_paths[0]
 
 
-class TableExample(Directive):
+class HwtBuildReportTableDirective(Directive):
     def __init__(self, name, arguments, options, content,
-                 lineno, content_offset, block_text, state, state_machine, table_data):
+                 lineno, content_offset, block_text, state, state_machine, table_header, table_data):
+        self.table_header = table_header
         self.table_data = table_data
         super().__init__(name, arguments, options, content, lineno,
                          content_offset, block_text, state, state_machine)
 
-    def run(self):
+    def generate_table_name(self):
         name = self.name
-        table_data = self.table_data
+        fieldname = nodes.field_name(_(name), _(name))
+        icon_dst = BuildReportPath.get_sql_icon_name_absolute(
+            self.state.document)
 
-        colwidths = tuple(1 for x in table_data.keys())
-        header = tuple(table_data.keys())
-        data = [tuple(table_data.values()), ]
+        makedirs(dirname(icon_dst), exist_ok=True)
+        copyfile(BuildReportPath.SQLICON_PATH, icon_dst)
 
-        table_list = nodes.field_list()
-        obj_desc = nodes.field()
-        obj_desc += nodes.field_name(_(name), _(name))
-        table_list += obj_desc
+        # paste database in static
+        # logger in sphinx
+        # what and where missing
+        config = self.state.document.settings.env.config
+        img = nodes.image(uri="/_static/sql.png", height="24px",
+                          width="24px", alt="Not Found")
+
+        db_link_element = nodes.reference("",  # internal=False,
+                                          refuri=config.hwt_buildreport_database_name)
+        db_link_element.append(img)
+        fieldname += db_link_element
+        return fieldname
+
+    def generate_table_body(self):
+        header = self.table_header
+        colwidths = tuple(1 for x in header)
 
         table = nodes.table()
-        obj_desc += table
         tgroup = nodes.tgroup(cols=len(header))
         table += tgroup
+
         for colwidth in colwidths:
             tgroup += nodes.colspec(colwidth=colwidth)
         thead = nodes.thead()
         tgroup += thead
         thead += self.create_table_row(header)
+
         tbody = nodes.tbody()
         tgroup += tbody
-        for data_row in data:
+
+        for data_row in self.table_data:
             tbody += self.create_table_row(data_row)
+        return table
+
+    def run(self):
+        table_list = nodes.definition_list()
+        obj_desc = nodes.field()
+        table_list += obj_desc
+
+        obj_desc += self.generate_table_name()
+        obj_desc += self.generate_table_body()
+
         return [table_list]
 
     @classmethod
@@ -61,114 +104,75 @@ class TableExample(Directive):
         return row
 
 
-class BuildReportPaths(SchematicPaths):
-    BUILD_REPORT_FILES_DIR = "buildreport"
-
-    @classmethod
-    def get_build_report_file_name_absolute(cls, document, absolute_name, serialno):
-        return path.join(document.settings.env.app.builder.outdir,
-                         cls.get_build_report_file_name(document, absolute_name, serialno))
-
-    @classmethod
-    def get_build_report_file_name(cls, document, absolute_name, serialno):
-        sp = cls.get_static_path(document)
-        return "%s-%s.%s" % (
-            path.join(sp, cls.BUILD_REPORT_FILES_DIR, absolute_name),
-            serialno,
-            "csv")
-
-
-class hwt_buildreport(nodes.General, nodes.Element):
-    def __init__(self, constructor_fn_name: Optional[str], *args, **kwargs):
-        """
-        :param constructor_fn_name: optional name of explicit constructor function
-        """
-        super(hwt_buildreport, self).__init__(*args, **kwargs)
-        self["constructor_fn_name"] = constructor_fn_name
-
-    @staticmethod
-    def visit_html(self, node: "hwt_buildreport"):
-        absolute_name = get_absolute_name_of_class_of_node(node)
-        constructor_fn_name = node["constructor_fn_name"]
-        serialno = node["serialno"]
-
-        try:
-            build_report_file = BuildReportPaths.get_build_report_file_name_absolute(
-                self.document, absolute_name, serialno)
-            makedirs(path.dirname(build_report_file), exist_ok=True)
-            u = construct_hwt_obj(
-                absolute_name, constructor_fn_name, Unit, "hwt-buildreport")
-
-            report_data = {'lut': 0, 'ff': 0, 'latch': 0,
-                           'bram': 0, 'uram': 0, 'dsp': 0}
-            # with ReplayingExecutor("/home/kali/Dokumenty/hwtBuildsystem/tests/SimpleUnitAxiStreamTop_synth_trace.json") as v:
-            #    r = buildUnit(v, u, "tmp",
-            #                  synthesize=True,
-            #                  implement=False,
-            #                  writeBitstream=False,
-            #                  # openGui=True,
-            #                  )
-            #    report_data = getLutFfLatchBramUramDsp(r.parseUtilizationSynth())
-            description_group_list = []
-
-            with open(build_report_file, "w") as file:
-                header = []
-                valuesrow = []
-                for k, v in report_data.items():
-                    header.append(k)
-                    valuesrow.append(str(v))
-
-                file.write(";".join(header) + "\n")
-                file.write(";".join(valuesrow) + "\n")
-
-            csv = nodes.Text("SOMETHING")
-            node += csv
-
-        except Exception as e:
-            logging.error(e, exc_info=True)
-            raise Exception(
-                f"Error occured while processing of {absolute_name:s}")
-
-    @staticmethod
-    def depart_html(self, node: "hwt_buildreport"):
-        pass
-
-
-class hwtBuildreportDirective(Directive):
+class HwtBuildreportDirective(Directive):
     optional_arguments = 1
     final_argument_whitespace = False
     has_content = False
 
+    def register_in_db(self, component_class_path: str, constructor_name: Optional[str]):
+        """
+        :param component_class_path: class path
+        :param constructor_name: aditional name of the function which can configure the component
+        """
+        config = self.state.document.settings.env.config
+        sqlconnect = sqlite3.connect(config.hwt_buildreport_database_name)
+        sqlcursor = sqlconnect.cursor()
+
+        sqltable = "CREATE TABLE IF NOT EXISTS builds (component_class_path text, constructor_name text)"
+        sqlcursor.execute(sqltable)
+
+        sqlquerry = 'INSERT INTO builds VALUES (?, ?);'
+        sqlcursor.execute(sqlquerry, (component_class_path, constructor_name))
+
+        sqlconnect.commit()
+        sqlconnect.close()
+
     def run(self):
-
-        #build_report_list, obj_list = construct_property_description_list('HDL build reports')
-
+        node = self.state
+        component_class_path = get_absolute_name_of_class_of_node(node)
         constructor_fn_name = get_constructor_name(self)
-        env = self.state.document.settings.env
-        serialno = env.new_serialno('hwt_buildreport')
+        config = self.state.document.settings.env.config
 
-        # build_report = hwt_buildreport(constructor_fn_name=constructor_fn_name,
-        #                            serialno=serialno)
-        #build_report_list += build_report
-        report_data = {'lut': 0, 'ff': 0, 'latch': 0,
-                       'bram': 0, 'uram': 0, 'dsp': 0}
-        report_datav2 = {'SOMETHING': 120, 'HF': 0, 'LH': 50,
-                         'bram': 20, 'uram': 30, 'dsp': 4}
+        self.register_in_db(component_class_path, constructor_fn_name)
+        sqlconnect = sqlite3.connect(config.hwt_buildreport_database_name)
+        sqlcursor = sqlconnect.cursor()
 
-        name = "TB1"
+        tables = config.hwt_buildreport_tables
+        
         build_reports = []
-        for table_data in [report_data, report_datav2]:
-            build_report = TableExample(name, self.arguments, self.options, self.content, self.lineno,
-                                        self.content_offset, self.block_text, self.state, self.state_machine, table_data).run()
-            build_reports.extend(build_report)
-        # self.state.nested_parse(self.content,
-        #            self.content_offset,
-        #            build_report)
+        for (table_name, table_header) in tables:
+            sqlcursor.execute(
+                ''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name=? ''', (table_name, ))
+
+            if sqlcursor.fetchone()[0] == 0:
+                continue
+            
+            table_header_str = ", ".join(table_header)
+            print(table_header_str)
+
+            sqlcursor.execute(
+                f"SELECT {table_header_str:s} FROM {table_name:s} WHERE component_name=?", (component_class_path, ))
+            table_data = sqlcursor.fetchall()
+            build_report = HwtBuildReportTableDirective(
+                table_name, self.arguments,
+                self.options, self.content,
+                self.lineno, self.content_offset,
+                self.block_text, self.state,
+                self.state_machine, table_header, table_data).run()
+
+            if table_data:
+                build_reports.extend(build_report)
+            else:
+                logging.warning(f"Missing record for {component_class_path:s} in {table_name:s} in {config.hwt_buildreport_database_name:s}")
+                #build_report.append(nodes.Text("Empty"))
+
+        sqlconnect.commit()
+        sqlconnect.close()
+
         return [*build_reports, ]
 
 
 def setup(app: Sphinx):
-    app.add_node(hwt_buildreport,
-                 html=(hwt_buildreport.visit_html,
-                       hwt_buildreport.depart_html))
-    app.add_directive('hwt-buildreport', hwtBuildreportDirective)
+    app.add_directive('hwt-buildreport', HwtBuildreportDirective)
+    app.add_config_value('hwt_buildreport_tables', [], True)
+    app.add_config_value('hwt_buildreport_database_name', "hwt_buildreport_database.db", True)
