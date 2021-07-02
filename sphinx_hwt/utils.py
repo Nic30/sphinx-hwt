@@ -21,10 +21,17 @@ def generic_import(name: Union[str, List[str]]):
         assert isinstance(name, list), name
         components = name
 
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-
+    mod = None
+    for i, comp in enumerate(components):
+        try:
+            # if imported sucessfully __import__ returns a top module
+            mod = __import__('.'.join(components[:i + 1]))
+        except ModuleNotFoundError:
+            for comp in components[1:]:
+                try:
+                    mod = getattr(mod, comp)
+                except AttributeError:
+                    raise
     return mod
 
 

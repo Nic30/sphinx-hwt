@@ -130,9 +130,9 @@ class clean(_clean):
 
 setup(
     name='sphinx-hwt',
-    version='2.6',
+    version='2.7',
     author="Michal Orsak",
-    author_email="michal.o.socials@gmail.com",
+    author_email="Nic30original@gmail.com",
     description="Sphinx extension to produce interactive schematic for hardware written in HWT",
     license='BSD-3-Clause',
     keywords='sphinx documentation HWT FPGA hardware VHDL System Verilog schematic wave',
@@ -141,8 +141,8 @@ setup(
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     install_requires=[
-        'sphinx>=3.2.1',  # base sphinx doc generator
-        'hwtGraph>=1.9',  # converts HWT Units to schematics
+        'sphinx>=4.0.2',  # base sphinx doc generator
+        'hwtGraph>=2.1',  # converts HWT Units to schematics
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
