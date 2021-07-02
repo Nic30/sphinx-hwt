@@ -138,7 +138,7 @@ class HwtBuildreportDirective(Directive):
         sqlcursor = sqlconnect.cursor()
 
         tables = config.hwt_buildreport_tables
-        
+
         build_reports = []
         for (table_name, table_header) in tables:
             sqlcursor.execute(
@@ -146,10 +146,8 @@ class HwtBuildreportDirective(Directive):
 
             if sqlcursor.fetchone()[0] == 0:
                 continue
-            
-            table_header_str = ", ".join(table_header)
-            print(table_header_str)
 
+            table_header_str = ", ".join(table_header)
             sqlcursor.execute(
                 f"SELECT {table_header_str:s} FROM {table_name:s} WHERE component_name=?", (component_class_path, ))
             table_data = sqlcursor.fetchall()
@@ -163,8 +161,9 @@ class HwtBuildreportDirective(Directive):
             if table_data:
                 build_reports.extend(build_report)
             else:
-                logging.warning(f"Missing record for {component_class_path:s} in {table_name:s} in {config.hwt_buildreport_database_name:s}")
-                #build_report.append(nodes.Text("Empty"))
+                logging.warning(
+                    f"Missing record for {component_class_path:s} in {table_name:s} in {config.hwt_buildreport_database_name:s}")
+                # build_report.append(nodes.Text("Empty"))
 
         sqlconnect.commit()
         sqlconnect.close()
@@ -175,4 +174,5 @@ class HwtBuildreportDirective(Directive):
 def setup(app: Sphinx):
     app.add_directive('hwt-buildreport', HwtBuildreportDirective)
     app.add_config_value('hwt_buildreport_tables', [], True)
-    app.add_config_value('hwt_buildreport_database_name', "hwt_buildreport_database.db", True)
+    app.add_config_value('hwt_buildreport_database_name',
+                         "hwt_buildreport_database.db", True)
