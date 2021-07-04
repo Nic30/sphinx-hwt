@@ -8,7 +8,7 @@ from tests.directive_HwtComponents_test import HwtComponents_directive_TC
 from tests.directive_HwtInterfaces_test import HwtInterfaces_directive_TC
 from tests.directive_HwtParams_test import HwtParams_directive_TC
 from tests.directive_HwtSchematic_test import HwtSchematic_directive_TC
-
+from tests.directive_HwtBuildreport_test import HwtBuildReport_directive_TC
 
 TCs = [
     HwtSchematic_directive_TC,
@@ -16,6 +16,7 @@ TCs = [
     HwtInterfaces_directive_TC,
     HwtAutodoc_directive_TC,
     HwtComponents_directive_TC,
+    HwtBuildReport_directive_TC,
 ]
 suite = unittest.TestSuite()
 # suite.addTest(HwtSchematic_directive_TC('test_test_speficified_constructor_nested'))

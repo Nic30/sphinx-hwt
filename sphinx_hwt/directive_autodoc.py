@@ -8,7 +8,7 @@ from sphinx_hwt.directive_params import HwtParamsDirective
 from sphinx_hwt.directive_interfaces import HwtInterfacesDirective
 from sphinx_hwt.directive_schematic import HwtSchematicDirective
 from sphinx_hwt.directive_components import HwtComponentsDirective
-from sphinx_hwt.directive_buildReport import HwtBuildreportDirective
+from sphinx_hwt.directive_buildreport import HwtBuildreportDirective
 
 
 class HwtAutodocDirective(HwtSchematicDirective):

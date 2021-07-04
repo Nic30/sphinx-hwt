@@ -1,7 +1,7 @@
 from sphinx.application import Sphinx
 
 from sphinx_hwt.directive_autodoc import setup as autodoc_setup
-from sphinx_hwt.directive_buildReport import setup as buildReport_setup
+from sphinx_hwt.directive_buildreport import setup as buildReport_setup
 from sphinx_hwt.directive_interfaces import setup as interfaces_setup
 from sphinx_hwt.directive_params import setup as params_setup
 from sphinx_hwt.directive_components import setup as components_setup

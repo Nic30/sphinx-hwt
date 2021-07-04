@@ -4,7 +4,7 @@ from os import path, makedirs
 from docutils import nodes
 from typing import Optional
 from docutils.parsers.rst import Directive
-import logging
+from sphinx.util import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
 from hwt.synthesizer.interface import Interface
@@ -15,7 +15,6 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     ref_to_class, construct_hwt_obj
 from sphinx_hwt.directive_schematic import SchematicLink, SchematicPaths
 import sqlite3
-
 
 class BuildReportPath():
 
@@ -51,8 +50,8 @@ class HwtBuildReportTableDirective(Directive):
         copyfile(BuildReportPath.SQLICON_PATH, icon_dst)
 
         # paste database in static
-        # logger in sphinx
-        # what and where missing
+        # tests
+
         config = self.state.document.settings.env.config
         img = nodes.image(uri="/_static/sql.png", height="24px",
                           width="24px", alt="Not Found")
@@ -128,6 +127,7 @@ class HwtBuildreportDirective(Directive):
         sqlconnect.close()
 
     def run(self):
+        
         node = self.state
         component_class_path = get_absolute_name_of_class_of_node(node)
         constructor_fn_name = get_constructor_name(self)
@@ -161,7 +161,8 @@ class HwtBuildreportDirective(Directive):
             if table_data:
                 build_reports.extend(build_report)
             else:
-                logging.warning(
+                logger = logging.getLogger(__name__)
+                logger.warning(
                     f"Missing record for {component_class_path:s} in {table_name:s} in {config.hwt_buildreport_database_name:s}")
                 # build_report.append(nodes.Text("Empty"))
 
