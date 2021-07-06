@@ -16,13 +16,22 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
 from sphinx_hwt.directive_schematic import SchematicLink, SchematicPaths
 import sqlite3
 
-class BuildReportPath():
+
+class BuildReportPath:
 
     SQLICON_PATH = path.join(path.dirname(__file__), "html", "sql.png")
+
+    def DB_PATH(buildreport_database_name):
+        return path.join(path.dirname(__file__), "html", buildreport_database_name)
+        #path.join(path.dirname(__file__), "..", "tests", "test_buildReport_simple", buildreport_database_name)
 
     @classmethod
     def get_sql_icon_name_absolute(cls, document):
         return path.join(document.settings.env.app.builder.outdir, cls.get_static_path(document), "sql.png")
+
+    @classmethod
+    def get_db_name_absolute(cls, document, buildreport_database_name):
+        return path.join(document.settings.env.app.builder.outdir, cls.get_static_path(document), buildreport_database_name)
 
     @classmethod
     def get_static_path(cls, document):
@@ -49,15 +58,19 @@ class HwtBuildReportTableDirective(Directive):
         makedirs(dirname(icon_dst), exist_ok=True)
         copyfile(BuildReportPath.SQLICON_PATH, icon_dst)
 
-        # paste database in static
-        # tests
+        config = HwtBuildreportDirective.config_file(self)
+        db_dst = BuildReportPath.get_db_name_absolute(
+            self.state.document, config.hwt_buildreport_database_name)
 
-        config = self.state.document.settings.env.config
+        makedirs(dirname(db_dst), exist_ok=True)
+        copyfile(BuildReportPath.DB_PATH(
+            config.hwt_buildreport_database_name), db_dst)
+
         img = nodes.image(uri="/_static/sql.png", height="24px",
                           width="24px", alt="Not Found")
 
         db_link_element = nodes.reference("",  # internal=False,
-                                          refuri=config.hwt_buildreport_database_name)
+                                          refuri=db_dst)
         db_link_element.append(img)
         fieldname += db_link_element
         return fieldname
@@ -108,12 +121,16 @@ class HwtBuildreportDirective(Directive):
     final_argument_whitespace = False
     has_content = False
 
+    def config_file(self):
+        config = self.state.document.settings.env.config
+        return config
+
     def register_in_db(self, component_class_path: str, constructor_name: Optional[str]):
         """
         :param component_class_path: class path
         :param constructor_name: aditional name of the function which can configure the component
         """
-        config = self.state.document.settings.env.config
+        config = self.config_file()
         sqlconnect = sqlite3.connect(config.hwt_buildreport_database_name)
         sqlcursor = sqlconnect.cursor()
 
@@ -127,11 +144,11 @@ class HwtBuildreportDirective(Directive):
         sqlconnect.close()
 
     def run(self):
-        
+
         node = self.state
         component_class_path = get_absolute_name_of_class_of_node(node)
         constructor_fn_name = get_constructor_name(self)
-        config = self.state.document.settings.env.config
+        config = self.config_file()
 
         self.register_in_db(component_class_path, constructor_fn_name)
         sqlconnect = sqlite3.connect(config.hwt_buildreport_database_name)
