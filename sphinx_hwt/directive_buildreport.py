@@ -214,11 +214,24 @@ class HwtBuildreportDirective(Directive):
 
 
 def init_static_files_and_database(app: Sphinx, env, docnames):
-    db_src = path.join(env.srcdir,
-                       env.config.hwt_buildreport_database_name)
     db_dst = BuildreportPaths.get_db_file_dst_absolute_from_env(env)
     makedirs(dirname(db_dst), exist_ok=True)
-    copyfile(db_src, db_dst)
+    import requests
+
+    db_name: str = env.config.hwt_buildreport_database_name
+
+    if db_name is None:
+        return
+
+    elif db_name.startswith("http://") or db_name.startswith("https://"):
+        r = requests.get(db_name, allow_redirects=True)
+        with open(db_dst, 'wb') as f:
+            f.write(r.content)
+    else:
+        db_src = path.join(env.srcdir,
+                           db_name)
+
+        copyfile(db_src, db_dst)
 
     icon_dst = BuildreportPaths.get_sql_icon_name_absolute(env)
     makedirs(dirname(icon_dst), exist_ok=True)
@@ -229,6 +242,6 @@ def setup(app: Sphinx):
     app.add_directive('hwt-buildreport', HwtBuildreportDirective)
     app.add_config_value('hwt_buildreport_tables', [], True)
     app.add_config_value('hwt_buildreport_database_name',
-                         "_static/hwt_buildreport_database.db", True)
+                         None, True)
 
     app.connect('env-before-read-docs', init_static_files_and_database)
