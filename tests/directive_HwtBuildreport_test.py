@@ -10,8 +10,8 @@ from tests.utils import run_test
 
 class HwtBuildReport_directive_TC(unittest.TestCase):
 
-    def test_buildReport_simple(self):
-        run_test("test_buildReport_simple")
+    def test_buildreport_simple(self):
+        run_test("test_buildreport_simple")
 
 if __name__ == "__main__":
     unittest.main()
