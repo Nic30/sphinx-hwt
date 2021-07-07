@@ -163,5 +163,5 @@ hwt_buildreport_tables = [
     ("yosys_builds", ("lut", "ff", "latch", "bram", "uram", "dsp"))
 ]
 
-hwt_buildreport_database_name = "hwt_buildreport_database.db"
+hwt_buildreport_database_name = "_static/hwt_buildreport_database.db"
 makedirs("_static", exist_ok=True)
