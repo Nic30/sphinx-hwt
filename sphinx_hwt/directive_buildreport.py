@@ -21,34 +21,44 @@ class BuildreportPaths:
     SQLICON_PATH = path.join(path.dirname(__file__), "html", "sql.png")
 
     @classmethod
-    def get_sql_icon_name_absolute(cls, document):
-        return path.join(document.settings.env.srcdir,
-                         cls.get_static_path(document),
+    def get_sql_icon_name_absolute(cls, env):
+        return path.join(env.srcdir,
+                         cls.get_static_path_from_env(env),
                          "sql.png")
 
-    @staticmethod
-    def get_static_path(document):
-        static_paths = document.settings.env.config.html_static_path
+    @classmethod
+    def get_static_path(cls, document):
+        return cls.get_static_path_from_env(document.settings.env)
+
+    @classmethod
+    def get_static_path_from_env(cls, env):
+        static_paths = env.config.html_static_path
         if not static_paths:
             return "_static"
         return static_paths[0]
 
     @classmethod
-    def get_db_file_src(cls, state):
-        return path.join(state.document.settings.env.srcdir,
-                         get_config(state).hwt_buildreport_database_name)
+    def get_db_file_dst_absolute_from_env(cls, env):
+        static_paths = env.config.html_static_path
+        if static_paths:
+            static_path = static_paths[0]
+        else:
+            static_path = "_static"
+
+        return path.join(
+            env.app.builder.outdir,
+            static_path,
+            "hwt_buildreport.db"
+        )
 
     @classmethod
     def get_db_file_dst_absolute(cls, state):
-        return path.join(
-            state.document.settings.env.app.builder.outdir,
-            cls.get_db_file_dst_uri(state)
-        )
+        return cls.get_db_file_dst_absolute_from_env(state.document.settings.env)
 
     @classmethod
     def get_db_file_dst_uri(cls, state):
         return path.join(cls.get_static_path(state.document),
-            "hwt_buildreport.db")
+                         "hwt_buildreport.db")
 
 
 def get_config(state):
@@ -71,17 +81,8 @@ class HwtBuildReportTableDirective(Directive):
         name = self.name
         fieldname = nodes.field_name(_(name), _(name))
 
-        db_src = BuildreportPaths.get_db_file_src(self.state)
-        db_dst = BuildreportPaths.get_db_file_dst_absolute(self.state)
-        makedirs(dirname(db_dst), exist_ok=True)
-        copyfile(db_src, db_dst)
-
-        db_link_element = nodes.reference("", refuri=BuildreportPaths.get_db_file_dst_uri(self.state))
-
-        icon_dst = BuildreportPaths.get_sql_icon_name_absolute(
-            self.state.document)
-        makedirs(dirname(icon_dst), exist_ok=True)
-        copyfile(BuildreportPaths.SQLICON_PATH, icon_dst)
+        db_link_element = nodes.reference(
+            "", refuri=BuildreportPaths.get_db_file_dst_uri(self.state))
 
         img = nodes.image(uri="/_static/sql.png", height="24px",
                           width="24px", alt="DB icon")
@@ -146,7 +147,8 @@ class HwtBuildreportDirective(Directive):
         :param component_class_path: class path
         :param constructor_name: aditional name of the function which can configure the component
         """
-        sqlconnect = sqlite3.connect(BuildreportPaths.get_db_file_src(self.state))
+        sqlconnect = sqlite3.connect(
+            BuildreportPaths.get_db_file_dst_absolute(self.state))
         try:
             sqlcursor = sqlconnect.cursor()
 
@@ -154,7 +156,8 @@ class HwtBuildreportDirective(Directive):
             sqlcursor.execute(sqltable)
 
             sqlquerry = 'INSERT INTO builds VALUES (?, ?);'
-            sqlcursor.execute(sqlquerry, (component_class_path, constructor_name))
+            sqlcursor.execute(
+                sqlquerry, (component_class_path, constructor_name))
 
             sqlconnect.commit()
         finally:
@@ -173,7 +176,8 @@ class HwtBuildreportDirective(Directive):
         self.register_in_db(component_class_path, constructor_fn_name)
 
         # load build report from db and construct report tables in document
-        sqlconnect = sqlite3.connect(BuildreportPaths.get_db_file_src(state))
+        sqlconnect = sqlite3.connect(
+            BuildreportPaths.get_db_file_dst_absolute(state))
         try:
             sqlcursor = sqlconnect.cursor()
             build_reports = []
@@ -201,11 +205,24 @@ class HwtBuildreportDirective(Directive):
                 else:
                     logger.warning(
                         f"Missing record for {component_class_path:s} in {table_name:s} in {self.get_db_file_src():s}")
-                    build_reports.append(nodes.Text(f"No build reports available in {table_name:s}"))
+                    build_reports.append(nodes.Text(
+                        f"No build reports available in {table_name:s}"))
         finally:
             sqlconnect.close()
 
         return [*build_reports, ]
+
+
+def init_static_files_and_database(app: Sphinx, env, docnames):
+    db_src = path.join(env.srcdir,
+                       env.config.hwt_buildreport_database_name)
+    db_dst = BuildreportPaths.get_db_file_dst_absolute_from_env(env)
+    makedirs(dirname(db_dst), exist_ok=True)
+    copyfile(db_src, db_dst)
+
+    icon_dst = BuildreportPaths.get_sql_icon_name_absolute(env)
+    makedirs(dirname(icon_dst), exist_ok=True)
+    copyfile(BuildreportPaths.SQLICON_PATH, icon_dst)
 
 
 def setup(app: Sphinx):
@@ -213,3 +230,5 @@ def setup(app: Sphinx):
     app.add_config_value('hwt_buildreport_tables', [], True)
     app.add_config_value('hwt_buildreport_database_name',
                          "_static/hwt_buildreport_database.db", True)
+
+    app.connect('env-before-read-docs', init_static_files_and_database)
