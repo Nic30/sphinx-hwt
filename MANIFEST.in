@@ -1,4 +1,4 @@
-#recursive-include sphinx_hwt/html *.html *.css *.js
+#recursive-include sphinx_hwt/html *.html *.css *.js *.png
 include sphinx_hwt/html/node_modules/elkjs/lib/elk.bundled.js
 include sphinx_hwt/html/node_modules/d3-hwschematic/dist/d3-hwschematic.js
 include sphinx_hwt/html/node_modules/d3-hwschematic/dist/d3-hwschematic.css
