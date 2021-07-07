@@ -108,6 +108,9 @@ venv.bak/
 .project
 .settings/
 
+# vscode
+.vscode
+
 # npm tmp files
 package-lock.json
 node_modules
