@@ -32,7 +32,11 @@ class SchematicPaths():
 
     @classmethod
     def get_static_path(cls, document):
-        static_paths = document.settings.env.config.html_static_path
+        return cls.get_static_path_from_env(document.settings.env)
+
+    @classmethod
+    def get_static_path_from_env(cls, env):
+        static_paths = env.config.html_static_path
         if not static_paths:
             return "_static"
         return static_paths[0]
@@ -51,9 +55,9 @@ class SchematicPaths():
                          cls.SCHEMATIC_VIEWER_URL)
 
     @classmethod
-    def get_sch_viewer_dir(cls, document):
-        return path.join(document.settings.env.app.builder.outdir,
-                         SchematicPaths.get_static_path(document),
+    def get_sch_viewer_dir(cls, env):
+        return path.join(env.app.builder.outdir,
+                         SchematicPaths.get_static_path_from_env(env),
                          "schematic_viewer")
 
 
@@ -111,25 +115,9 @@ class HwtSchematicDirective(Directive):
     final_argument_whitespace = False
     has_content = False
 
-    def __init__(self, *args, **kwargs):
-        Directive.__init__(self, *args, **kwargs)
-        self._extra_static_files_initialized_for = set()
-
-    def copy_extra_static_files(self):
-        document = self.state.document
-        sp = SchematicPaths.get_static_path(document)
-        if sp not in self._extra_static_files_initialized_for:
-            viewer_dir = SchematicPaths.get_sch_viewer_dir(document)
-            if path.exists(viewer_dir):
-                rmtree(viewer_dir)
-
-            copytree(SchematicPaths.SCHEMATIC_VIEWER_SRC_DIR, viewer_dir)
-            self._extra_static_files_initialized_for.add(sp)
-
     def run(self):
         # build dir path
         # https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/sphinxext/plot_directive.py#L699
-        self.copy_extra_static_files()
         constructor_fn_name = get_constructor_name(self)
         env = self.state.document.settings.env
         serialno = env.new_serialno('SchematicLink')
@@ -143,9 +131,17 @@ class HwtSchematicDirective(Directive):
         return [schema_node, ]
 
 
+def copy_scheme_viewer_static_files(app: Sphinx, env, docnames):
+    viewer_dir = SchematicPaths.get_sch_viewer_dir(env)
+    if path.exists(viewer_dir):
+        rmtree(viewer_dir)
+
+    copytree(SchematicPaths.SCHEMATIC_VIEWER_SRC_DIR, viewer_dir)
+
+
 def setup(app: Sphinx):
     app.add_node(SchematicLink,
                  html=(SchematicLink.visit_html,
                        SchematicLink.depart_html))
     app.add_directive('hwt-schematic', HwtSchematicDirective)
-
+    app.connect('env-before-read-docs', copy_scheme_viewer_static_files)
