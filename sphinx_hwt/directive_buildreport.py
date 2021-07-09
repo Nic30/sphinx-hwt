@@ -181,9 +181,9 @@ class HwtBuildreportDirective(Directive):
         try:
             sqlcursor = sqlconnect.cursor()
             build_reports = []
-            for (table_name, table_header) in get_config(state).hwt_buildreport_tables:
+            for ((table_db_buildreport_name, table_sphix_name), table_header) in get_config(state).hwt_buildreport_tables:
                 sqlcursor.execute(
-                    "SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+                    "SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table_db_buildreport_name,))
 
                 if sqlcursor.fetchone()[0] == 0:
                     # if table does not exists
@@ -191,10 +191,10 @@ class HwtBuildreportDirective(Directive):
 
                 table_columns_to_select_str = ", ".join(table_header)
                 sqlcursor.execute(
-                    f"SELECT {table_columns_to_select_str:s} FROM {table_name:s} WHERE component_name=?", (component_class_path,))
+                    f"SELECT {table_columns_to_select_str:s} FROM {table_db_buildreport_name:s} WHERE component_name=?", (component_class_path,))
                 table_data = sqlcursor.fetchall()
                 build_report = HwtBuildReportTableDirective(
-                    table_name, self.arguments,
+                    table_sphix_name, self.arguments,
                     self.options, self.content,
                     self.lineno, self.content_offset,
                     self.block_text, self.state,
@@ -204,9 +204,9 @@ class HwtBuildreportDirective(Directive):
                     build_reports.extend(build_report)
                 else:
                     logger.warning(
-                        f"Missing record for {component_class_path:s} in {table_name:s} in {self.get_db_file_src():s}")
+                        f"Missing record for {component_class_path:s} in {table_db_buildreport_name:s} in {self.get_db_file_src():s}")
                     build_reports.append(nodes.Text(
-                        f"No build reports available in {table_name:s}"))
+                        f"No build reports available in {table_db_buildreport_name:s}"))
         finally:
             sqlconnect.close()
 
