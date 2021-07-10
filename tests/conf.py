@@ -157,4 +157,13 @@ epub_copyright = copyright
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
+hwt_buildreport_tables = [
+    (("xilinx_vivado_builds", "XILINX BUILDS"), ("lut", "ff", "latch", "bram", "uram", "dsp")),
+    (("intel_quartus_builds", "INTEL BUILDS"), ("lut", "ff", "latch", "bram", "uram", "dsp")),
+    (("yosys_builds", "YOSYS BUILDS"), ("lut", "ff", "latch", "bram", "uram", "dsp"))
+]
+
+hwt_buildreport_database_name = "_static/hwt_buildreport_database.db"
+#hwt_buildreport_database_name = "https://github.com/BitR13x/sphinx-hwt/raw/master/tests/_static/hwt_buildreport_database.db"
+
 makedirs("_static", exist_ok=True)

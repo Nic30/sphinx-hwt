@@ -7,7 +7,7 @@ from sphinx.locale import _
 from sphinx.util import typing
 from typing import Union, List, Dict
 
-RE_IS_ID = re.compile("\w+")
+RE_IS_ID = re.compile(r"\w+")
 
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions

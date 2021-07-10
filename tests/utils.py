@@ -1,7 +1,7 @@
 from io import StringIO
-from os import path
+from os import path, makedirs
 import os
-from shutil import rmtree
+from shutil import rmtree, copy2
 from sphinx.cmd.build import main as sphinx_main
 from sphinx.ext.apidoc import main as apidoc_main
 import sys
@@ -27,6 +27,9 @@ def _run_test():
     if ret != 0:
         raise AssertionError("apidoc_main failed with err %d" % ret)
 
+    makedirs(path.join("doc", "_static"), exist_ok=True)
+    report_db = path.join("_static", "hwt_buildreport_database.db")
+    copy2(path.join(cwd, report_db), path.join("doc", report_db))
     # -b buildername
     # -a If given, always write all output files. The default is to only write output files for new and changed source files. (This may not apply to all builders.)
     # -E Don’t use a saved environment (the structure caching all cross-references), but rebuild it completely. The default is to only read and parse source files that are new or have changed since the last run.
