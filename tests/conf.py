@@ -157,4 +157,11 @@ epub_copyright = copyright
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
+hwt_buildreport_tables = [
+    ("xilinx_vivado_builds", ("lut", "ff", "latch", "bram", "uram", "dsp")),
+    ("intel_quartus_builds", ("lut", "ff", "latch", "bram", "uram", "dsp")),
+    ("yosys_builds", ("lut", "ff", "latch", "bram", "uram", "dsp"))
+]
+
+hwt_buildreport_database_name = "_static/hwt_buildreport_database.db"
 makedirs("_static", exist_ok=True)
