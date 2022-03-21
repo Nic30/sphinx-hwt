@@ -1,2 +1,2 @@
 -r https://raw.githubusercontent.com/Nic30/hwtGraph/master/doc/requirements.txt
-git+git://github.com/Nic30/hwtGraph.git#egg=hwtGraph
+git+https://github.com/Nic30/hwtGraph.git#egg=hwtGraph
