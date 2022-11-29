@@ -74,7 +74,7 @@
             var reason = "schematic url was not specified";
             svg.append("text")
                   .text(reason);
-        	throw Error(reason);
+        	//throw Error(reason);
         }
         d3.json(schematic_url)
           .then(function(graph) {
@@ -87,7 +87,7 @@
                   .text(reason);
                throw Error(reason);
            });
-
+        // {END_OF_JS}
     </script>
 </body>
 </html>
