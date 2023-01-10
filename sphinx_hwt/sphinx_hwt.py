@@ -15,3 +15,7 @@ def setup(app: Sphinx):
     schematic_setup(app)
     buildReport_setup(app)
     autodoc_setup(app)
+    return {
+        'parallel_read_safe': True,
+        'parallel_write_safe': True,
+    }
