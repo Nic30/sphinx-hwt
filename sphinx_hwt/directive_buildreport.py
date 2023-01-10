@@ -145,7 +145,7 @@ class HwtBuildreportDirective(Directive):
         Adds a record about this component into builds table in database to mark that this component should be build.
 
         :param component_class_path: class path
-        :param constructor_name: aditional name of the function which can configure the component
+        :param constructor_name: additional name of the function which can configure the component
         """
         sqlconnect = sqlite3.connect(
             BuildreportPaths.get_db_file_dst_absolute(self.state))
@@ -204,7 +204,7 @@ class HwtBuildreportDirective(Directive):
                     build_reports.extend(build_report)
                 else:
                     logger.warning(
-                        f"Missing record for {component_class_path:s} in {table_name:s} in {self.get_db_file_src():s}")
+                        f"Missing record for {component_class_path:s} in {table_name:s} in {BuildreportPaths.get_db_file_dst_absolute(self.state):s}")
                     build_reports.append(nodes.Text(
                         f"No build reports available in {table_name:s}"))
         finally:
