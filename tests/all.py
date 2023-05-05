@@ -10,7 +10,7 @@ from tests.directive_HwtParams_test import HwtParams_directive_TC
 from tests.directive_HwtSchematic_test import HwtSchematic_directive_TC
 from tests.directive_HwtBuildreport_test import HwtBuildReport_directive_TC
 
-TCs = [
+_ALL_TCs = [
     HwtSchematic_directive_TC,
     HwtParams_directive_TC,
     HwtInterfaces_directive_TC,
@@ -18,10 +18,9 @@ TCs = [
     HwtComponents_directive_TC,
     HwtBuildReport_directive_TC,
 ]
-suite = unittest.TestSuite()
-# suite.addTest(HwtSchematic_directive_TC('test_test_speficified_constructor_nested'))
-for tc in TCs:
-    suite.addTest(unittest.makeSuite(tc))
+testLoader = unittest.TestLoader()
+loadedTcs = [testLoader.loadTestsFromTestCase(tc) for tc in _ALL_TCs]
+suite = unittest.TestSuite(loadedTcs)
 
 if __name__ == "__main__":
     import sys
