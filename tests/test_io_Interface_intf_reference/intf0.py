@@ -1,6 +1,7 @@
-from hwt.hwIOs.std import HwIOSignal
 from hwt.hwIO import HwIO
+from hwt.hwIOs.std import HwIOSignal
 from hwt.hwParam import HwParam
+from hwt.pyUtils.typingFuture import override
 from ipCorePackager.constants import DIRECTION
 
 
@@ -12,10 +13,12 @@ class Intf1(HwIO):
 
     """
 
-    def _config(self):
+    @override
+    def hwConfig(self):
         self.WIDTH = HwParam(16)
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din0 = Intf0(masterDir=DIRECTION.IN)
         self.dout0 = Intf0()
 
@@ -30,9 +33,11 @@ class Intf0(HwIO):
     Text after
     """
 
-    def _config(self):
+    @override
+    def hwConfig(self):
         self.DATA_WIDTH = HwParam(8)
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal(masterDir=DIRECTION.IN)
         self.dout = HwIOSignal()

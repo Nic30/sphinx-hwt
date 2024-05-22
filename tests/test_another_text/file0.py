@@ -1,5 +1,6 @@
 from hwt.hwIOs.std import HwIOSignal
 from hwt.hwModule import HwModule
+from hwt.pyUtils.typingFuture import override
 
 
 class ExampleCls0(HwModule):
@@ -10,9 +11,11 @@ class ExampleCls0(HwModule):
 
     Some text after
     """
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal()
         self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout(self.din)

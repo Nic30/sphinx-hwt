@@ -35,7 +35,7 @@ class HwtIODirective(Directive):
     def run(self):
         try:
             m = get_instance_from_directive_node(self, (HwIO, HwModule))
-            m._loadDeclarations()
+            m._loadHwDeclarations()
         except Exception as e:
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)

@@ -1,5 +1,6 @@
-from hwt.hwModule import HwModule
 from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
+from hwt.pyUtils.typingFuture import override
 
 
 class CustomSignal(HwIOSignal):
@@ -11,9 +12,11 @@ class ExampleCls0(HwModule):
     .. hwt-io::
     """
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = CustomSignal()
         self.dout = CustomSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout(self.din)

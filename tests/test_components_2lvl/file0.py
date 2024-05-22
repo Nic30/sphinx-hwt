@@ -1,5 +1,6 @@
-from hwt.hwModule import HwModule
 from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
+from hwt.pyUtils.typingFuture import override
 
 
 class ExampleCls0(HwModule):
@@ -7,11 +8,13 @@ class ExampleCls0(HwModule):
     .. hwt-components::
     """
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal()
         self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout(self.din)
 
 
@@ -20,11 +23,13 @@ class ExampleCls1(HwModule):
     .. hwt-components::
     """
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal()
         self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls0()
         c0.din(self.din)
         self.dout(c0.dout)
@@ -35,11 +40,13 @@ class ExampleCls1x2(HwModule):
     .. hwt-components::
     """
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal()
         self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls0()
         c1 = self.c1 = ExampleCls0()
         c0.din(self.din)
@@ -52,11 +59,13 @@ class ExampleCls2(HwModule):
     .. hwt-components::
     """
 
-    def _declr(self):
+    @override
+    def hwDeclr(self):
         self.din = HwIOSignal()
         self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls1()
         c0.din(self.din)
         self.dout(c0.dout)
