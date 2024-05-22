@@ -1,10 +1,10 @@
-from hwt.interfaces.std import Signal
-from hwt.synthesizer.interface import Interface
-from hwt.synthesizer.param import Param
+from hwt.hwIOs.std import HwIOSignal
+from hwt.hwIO import HwIO
+from hwt.hwParam import HwParam
 from ipCorePackager.constants import DIRECTION
 
 
-class Intf0(Interface):
+class Intf0(HwIO):
     """
     Text before
 
@@ -18,9 +18,9 @@ class Intf0(Interface):
     """
 
     def _config(self):
-        self.DATA_WIDTH = Param(8)
+        self.DATA_WIDTH = HwParam(8)
 
     def _declr(self):
-        self.din = Signal(masterDir=DIRECTION.IN)
-        self.dout = Signal()
+        self.din = HwIOSignal(masterDir=DIRECTION.IN)
+        self.dout = HwIOSignal()
         self.x = 123

@@ -52,7 +52,7 @@ def get_absolute_name_of_class_of_node(node):
 
 class hwt_objs(nodes.General, nodes.Element):
     """
-    A directive which adds a list of HDL defined interfaces for Unit instances
+    A directive which adds a list of HDL defined interfaces for HwModule instances
     The message also contains information about default value and type of the parameter.
 
     :ivar obj_list: format (name, type_str, value_str)
@@ -80,12 +80,12 @@ def get_constructor_name(directive: Directive):
 
 def construct_hwt_obj(absolute_name: str, constructor_fn_name: str, allowed_classes, debug_directive_name: str):
     if constructor_fn_name is None:
-        unitCls = generic_import(absolute_name)
-        if not issubclass(unitCls, allowed_classes):
+        hwModuleCls = generic_import(absolute_name)
+        if not issubclass(hwModuleCls, allowed_classes):
             raise AssertionError(
                 f"Can not use {debug_directive_name:s} sphinx directive"
                 f" for {absolute_name:s} because it is not subclass of {allowed_classes}")
-        u = unitCls()
+        m = hwModuleCls()
     else:
         assert len(constructor_fn_name) > 0 and RE_IS_ID.match(constructor_fn_name), constructor_fn_name
         _absolute_name = []
@@ -96,13 +96,13 @@ def construct_hwt_obj(absolute_name: str, constructor_fn_name: str, allowed_clas
         _absolute_name.append(constructor_fn_name)
 
         constructor_fn = generic_import(_absolute_name)
-        u = constructor_fn()
-        if not isinstance(u, allowed_classes):
+        m = constructor_fn()
+        if not isinstance(m, allowed_classes):
             raise AssertionError(
                 f"Can not use {debug_directive_name:s} sphinx directive"
-                f" with {_absolute_name:s} because function did not returned instance of {allowed_classes}, (returned {u} of class {u.__class__})")
+                f" with {_absolute_name:s} because function did not returned instance of {allowed_classes}, (returned {m} of class {m.__class__})")
 
-    return u
+    return m
 
 
 def get_instance_from_directive_node(directive: Directive, allowed_classes):

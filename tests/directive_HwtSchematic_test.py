@@ -44,9 +44,9 @@ class HwtSchematic_directive_TC(unittest.TestCase):
                      if isfile(join(sch_dir, f))]
         self.assertEqual(len(sch_files), 3)
 
-    def test_not_a_Unit(self):
+    def test_not_a_HwModule(self):
         with self.assertRaises(AssertionError):
-            run_test("test_not_a_Unit", mock_stderr=True)
+            run_test("test_not_a_HwModule", mock_stderr=True)
 
 
 if __name__ == "__main__":

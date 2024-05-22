@@ -1,12 +1,23 @@
 from hwt.hwModule import HwModule
 from hwt.hwIOs.std import HwIOSignal
+from hwt.hwParam import HwParam
 
 
 class ExampleCls0(HwModule):
     """
-    .. hwt-schematic::
+    Some text before
 
+    .. hwt-io::
+
+    :ivar din: An extra doc of din
+    :ivar dout: An extra doc of dout
+
+    Some text after
     """
+
+    def _config(self) -> None:
+        self.PARAM0 = HwParam(0)
+        self.PARAM1 = HwParam(1)
 
     def _declr(self):
         self.din = HwIOSignal()

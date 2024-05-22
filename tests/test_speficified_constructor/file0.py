@@ -1,6 +1,6 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import VectSignal
-from hwt.synthesizer.param import Param
+from hwt.hwModule import HwModule
+from hwt.hwIOs.std import HwIOVectSignal
+from hwt.hwParam import HwParam
 
 
 def example_constructor():
@@ -9,22 +9,22 @@ def example_constructor():
     return u
 
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     .. hwt-schematic:: example_constructor
 
     """
 
     def _config(self)->None:
-        self.WIDTH = Param(1)
+        self.WIDTH = HwParam(1)
 
     def _declr(self):
-        self.din0 = VectSignal(self.WIDTH)
-        self.dout0 = VectSignal(self.WIDTH)._m()
+        self.din0 = HwIOVectSignal(self.WIDTH)
+        self.dout0 = HwIOVectSignal(self.WIDTH)._m()
 
         if self.WIDTH >= 3:
-            self.din1 = VectSignal(self.WIDTH)
-            self.dout1 = VectSignal(self.WIDTH)._m()
+            self.din1 = HwIOVectSignal(self.WIDTH)
+            self.dout1 = HwIOVectSignal(self.WIDTH)._m()
 
     def _impl(self):
         self.dout0(self.din0)

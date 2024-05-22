@@ -1,28 +1,28 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import Signal
+from hwt.hwModule import HwModule
+from hwt.hwIOs.std import HwIOSignal
 
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     .. hwt-components::
     """
 
     def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
     def _impl(self):
         self.dout(self.din)
 
 
-class ExampleCls1(Unit):
+class ExampleCls1(HwModule):
     """
     .. hwt-components::
     """
 
     def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
     def _impl(self):
         c0 = self.c0 = ExampleCls0()
@@ -30,14 +30,14 @@ class ExampleCls1(Unit):
         self.dout(c0.dout)
 
 
-class ExampleCls1x2(Unit):
+class ExampleCls1x2(HwModule):
     """
     .. hwt-components::
     """
 
     def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
     def _impl(self):
         c0 = self.c0 = ExampleCls0()
@@ -47,14 +47,14 @@ class ExampleCls1x2(Unit):
         self.dout(c1.dout)
 
 
-class ExampleCls2(Unit):
+class ExampleCls2(HwModule):
     """
     .. hwt-components::
     """
 
     def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
     def _impl(self):
         c0 = self.c0 = ExampleCls1()

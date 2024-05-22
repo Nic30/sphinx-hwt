@@ -8,10 +8,10 @@ from sphinx.application import Sphinx
 from sphinx.locale import _
 from typing import Optional
 
-from hwt.synthesizer.unit import Unit
-from hwt.synthesizer.utils import synthesised
+from hwt.hwModule import HwModule
+from hwt.synth import synthesised
 from hwtGraph.elk.containers.idStore import ElkIdStore
-from hwtGraph.elk.fromHwt.convertor import UnitToLNode
+from hwtGraph.elk.fromHwt.convertor import HwModuleToLNode
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM, \
     DEFAULT_LAYOUT_OPTIMIZATIONS
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
@@ -79,10 +79,10 @@ class SchematicLink(nodes.General, nodes.Inline, nodes.TextElement):
             schem_file = SchematicPaths.get_sch_file_name_absolute(
                 self.document, absolute_name, serialno)
             makedirs(path.dirname(schem_file), exist_ok=True)
-            u = construct_hwt_obj(absolute_name, constructor_fn_name, Unit, "hwt-schematic")
+            m = construct_hwt_obj(absolute_name, constructor_fn_name, HwModule, "hwt-schematic")
             with open(schem_file, "w") as f:
-                synthesised(u, DEFAULT_PLATFORM)
-                g = UnitToLNode(u, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
+                synthesised(m, DEFAULT_PLATFORM)
+                g = HwModuleToLNode(m, optimizations=DEFAULT_LAYOUT_OPTIMIZATIONS)
                 idStore = ElkIdStore()
                 data = g.toElkJson(idStore)
                 json.dump(data, f)

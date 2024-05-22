@@ -29,15 +29,15 @@ From now Sphinx will be able to use directives from sphinx-hwt to render schemat
 
 ## Usage
 
-Add hwt-schematic directive in docstring of Unit class like this (will add scheme to a html doc).
+Add hwt-schematic directive in docstring of HwModule class like this (will add scheme to a html doc).
 
 ```python
-from hwt.synthesizer.unit import Unit
+from hwt.hwModule import HwModule
 
 def explicit_constructor():
     return ExampleCls0()
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     .. hwt-schematic::
 
@@ -52,14 +52,14 @@ class ExampleCls0(Unit):
 
 
 ## Feature list
-* hwt-params - generates a list of hwt Params for Interface/Unit classes with a information about value and type
-* hwt-interface - generates a list of IO interfaces of the Interface/Unit class
-* hwt-components - generates a list of components for the Unit class
+* hwt-params - generates a list of hwt Params for Interface/HwModule classes with a information about value and type
+* hwt-interface - generates a list of IO interfaces of the Interface/HwModule class
+* hwt-components - generates a list of components for the HwModule class
 * hwt-schematic:
-  * generate interactive schematic for Unit instances (= module in verilog, entity + architecutere in VHDL).
+  * generate interactive schematic for HwModule instances (= module in verilog, entity + architecutere in VHDL).
     * zoom, pan, dynamic colapsing, net-select, searching and filtering
     * schematic rendered by [d3-hwschematic library](https://github.com/Nic30/d3-hwschematic)
-    * Unit instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
+    * HwModule instances to graph conversion by [hwtGraph library](https://github.com/Nic30/hwtGraph)
 * hwt-autodoc: hwt-params, hwt-interface, hwt-components and hwt-schematic at once
 
 

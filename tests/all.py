@@ -5,7 +5,7 @@ import unittest
 
 from tests.directive_HwtAutodoc_test import HwtAutodoc_directive_TC
 from tests.directive_HwtComponents_test import HwtComponents_directive_TC
-from tests.directive_HwtInterfaces_test import HwtInterfaces_directive_TC
+from tests.directive_HwtIO_test import HwtIO_directive_TC
 from tests.directive_HwtParams_test import HwtParams_directive_TC
 from tests.directive_HwtSchematic_test import HwtSchematic_directive_TC
 from tests.directive_HwtBuildreport_test import HwtBuildReport_directive_TC
@@ -13,7 +13,7 @@ from tests.directive_HwtBuildreport_test import HwtBuildReport_directive_TC
 _ALL_TCs = [
     HwtSchematic_directive_TC,
     HwtParams_directive_TC,
-    HwtInterfaces_directive_TC,
+    HwtIO_directive_TC,
     HwtAutodoc_directive_TC,
     HwtComponents_directive_TC,
     HwtBuildReport_directive_TC,

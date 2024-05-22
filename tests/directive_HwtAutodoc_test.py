@@ -8,11 +8,11 @@ from tests.utils import run_test
 
 class HwtAutodoc_directive_TC(unittest.TestCase):
 
-    def test_autodoc_Interface(self):
-        run_test("test_autodoc_Interface")
+    def test_autodoc_HwIO(self):
+        run_test("test_autodoc_HwIO")
 
-    def test_autodoc_Unit(self):
-        run_test("test_autodoc_Unit")
+    def test_autodoc_HwModule(self):
+        run_test("test_autodoc_HwModule")
 
 
 if __name__ == "__main__":

@@ -69,25 +69,28 @@
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        var schematic_url = getParameterByName("schematic");
-        if (schematic_url == null) {
-            var reason = "schematic url was not specified";
-            svg.append("text")
-                  .text(reason);
-        	throw Error(reason);
-        }
-        d3.json(schematic_url)
-          .then(function(graph) {
-              if (graph.hwMeta && graph.hwMeta.name)
-                  document.title = graph.hwMeta.name;
-              // load the data and render the elements
-              hwSchematic.bindData(graph);
-           }, function(reason) {
-               svg.append("text")
-                  .text(reason);
-               throw Error(reason);
-           });
-
+        var graph = null;
+        // {END_OF_JS}
+		if (!graph) {
+	        var schematic_url = getParameterByName("schematic");
+	        if (schematic_url == null) {
+	            var reason = "schematic url was not specified";
+	            svg.append("text")
+	                  .text(reason);
+	        	throw Error(reason);
+	        }
+	        d3.json(schematic_url)
+	          .then(function(graph) {
+	              if (graph.hwMeta && graph.hwMeta.name)
+	                  document.title = graph.hwMeta.name;
+	              // load the data and render the elements
+	              hwSchematic.bindData(graph);
+	           }, function(reason) {
+	               svg.append("text")
+	                  .text(reason);
+	               throw Error(reason);
+	           });
+		}
     </script>
 </body>
 </html>

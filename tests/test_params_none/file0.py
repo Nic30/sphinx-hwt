@@ -1,8 +1,8 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import Signal
+from hwt.hwModule import HwModule
+from hwt.hwIOs.std import HwIOSignal
 
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     Some text before
 
@@ -12,8 +12,8 @@ class ExampleCls0(Unit):
     """
 
     def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
     def _impl(self):
         self.dout(self.din)

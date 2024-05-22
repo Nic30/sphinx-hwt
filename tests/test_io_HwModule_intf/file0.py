@@ -5,7 +5,7 @@ from hwt.hwIOs.std import HwIOSignal
 class ExampleCls0(HwModule):
     """
     .. hwt-schematic::
-
+    .. hwt-io::
     """
 
     def _declr(self):
