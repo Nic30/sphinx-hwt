@@ -1,16 +1,27 @@
-from hwt.hwModule import HwModule
 from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
+from hwt.hwParam import HwParam
 from hwt.pyUtils.typingFuture import override
 
 
 class ExampleCls0(HwModule):
     """
+    SOMETHING
+
     Some text before
 
-    .. hwt-params::
+    .. hwt-autodoc::
+
+    :ivar din: An extra doc of din
+    :ivar dout: An extra doc of dout
 
     Some text after
     """
+
+    @override
+    def hwConfig(self) -> None:
+        self.PARAM0 = HwParam(0)
+        self.PARAM1 = HwParam(1)
 
     @override
     def hwDeclr(self):

@@ -1,45 +1,52 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import Signal
+from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
+from hwt.pyUtils.typingFuture import override
 
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     .. hwt-components::
     """
 
-    def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+    @override
+    def hwDeclr(self):
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout(self.din)
 
 
-class ExampleCls1(Unit):
+class ExampleCls1(HwModule):
     """
     .. hwt-components::
     """
 
-    def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+    @override
+    def hwDeclr(self):
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls0()
         c0.din(self.din)
         self.dout(c0.dout)
 
 
-class ExampleCls1x2(Unit):
+class ExampleCls1x2(HwModule):
     """
     .. hwt-components::
     """
 
-    def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+    @override
+    def hwDeclr(self):
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls0()
         c1 = self.c1 = ExampleCls0()
         c0.din(self.din)
@@ -47,16 +54,18 @@ class ExampleCls1x2(Unit):
         self.dout(c1.dout)
 
 
-class ExampleCls2(Unit):
+class ExampleCls2(HwModule):
     """
     .. hwt-components::
     """
 
-    def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+    @override
+    def hwDeclr(self):
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         c0 = self.c0 = ExampleCls1()
         c0.din(self.din)
         self.dout(c0.dout)

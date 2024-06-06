@@ -1,15 +1,12 @@
-from hwt.hwModule import HwModule
 from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
 from hwt.pyUtils.typingFuture import override
 
 
 class ExampleCls0(HwModule):
     """
-    Some text before
-
-    .. hwt-params::
-
-    Some text after
+    .. hwt-schematic::
+    .. hwt-io::
     """
 
     @override

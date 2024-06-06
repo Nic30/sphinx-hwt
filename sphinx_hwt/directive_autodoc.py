@@ -1,11 +1,11 @@
 import logging
 from sphinx.application import Sphinx
-from hwt.synthesizer.interface import Interface
-from hwt.synthesizer.unit import Unit
+from hwt.hwIO import HwIO
+from hwt.hwModule import HwModule
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     get_instance_from_directive_node
 from sphinx_hwt.directive_params import HwtParamsDirective
-from sphinx_hwt.directive_interfaces import HwtInterfacesDirective
+from sphinx_hwt.directive_io import HwtIODirective
 from sphinx_hwt.directive_schematic import HwtSchematicDirective
 from sphinx_hwt.directive_components import HwtComponentsDirective
 from sphinx_hwt.directive_buildreport import HwtBuildreportDirective
@@ -17,7 +17,7 @@ class HwtAutodocDirective(HwtSchematicDirective):
         "Can not use multiple hwt-autodoc/hwt-schematic/hwt-params/hwt-interfaces in a single class"
 
         try:
-            u = get_instance_from_directive_node(self, (Interface, Unit))
+            m = get_instance_from_directive_node(self, (HwIO, HwModule))
         except Exception as e:
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)
@@ -25,9 +25,9 @@ class HwtAutodocDirective(HwtSchematicDirective):
                 f"Error occured while processing of {absolute_name:s}")
 
         params = HwtParamsDirective.run(self)
-        interfaces = HwtInterfacesDirective.run(self)
+        interfaces = HwtIODirective.run(self)
 
-        if isinstance(u, Unit):
+        if isinstance(m, HwModule):
             components = HwtComponentsDirective.run(self)
             schemes = HwtSchematicDirective.run(self)
             build_report = HwtBuildreportDirective(

@@ -3,8 +3,8 @@ from docutils.parsers.rst import Directive
 import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
-from hwt.synthesizer.interface import Interface
-from hwt.synthesizer.unit import Unit
+from hwt.hwIO import HwIO
+from hwt.hwModule import HwModule
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     hwt_objs, merge_variable_lists_into_hwt_objs, \
     get_instance_from_directive_node, construct_property_description_list, \
@@ -13,7 +13,7 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
 
 class hwt_params(hwt_objs):
     """
-    A directive which adds a list of defined HDL parameters for Unit instances
+    A directive which adds a list of defined HDL parameters for HwModule instances
     The message also contains information about default value and type of the parameter.
     """
 
@@ -33,21 +33,21 @@ class HwtParamsDirective(Directive):
 
     def run(self):
         try:
-            u = get_instance_from_directive_node(self, (Interface, Unit))
+            m = get_instance_from_directive_node(self, (HwIO, HwModule))
         except Exception as e:
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)
             raise Exception(
-                f"Error occured while processing of {absolute_name:s}")
+                f"Error occurred while processing of {absolute_name:s}")
 
-        if not u._params:
+        if not m._hwParams:
             return []
 
         description_group_list, obj_list = construct_property_description_list('HDL params')
         def_val = _('default value')
         of_type = _('of type')
         name_to_descr_paragraph = {}
-        for p in u._params:
+        for p in m._hwParams:
             name = p._name
             v = p.get_value()
             t = getattr(v, "_dtype", None)

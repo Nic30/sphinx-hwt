@@ -4,8 +4,8 @@ import logging
 from sphinx.application import Sphinx
 from sphinx.locale import _
 
-from hwt.synthesizer.unit import Unit
-from hwt.synthesizer.utils import synthesised
+from hwt.hwModule import HwModule
+from hwt.synth import synthesised
 from hwtGraph.elk.fromHwt.defauts import DEFAULT_PLATFORM
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     hwt_objs, merge_variable_lists_into_hwt_objs, \
@@ -15,7 +15,7 @@ from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
 
 class hwt_components(hwt_objs):
     """
-    A directive which adds a list of defined HDL components for Unit instances
+    A directive which adds a list of defined HDL components for HwModule instances
     The message also contains information about default value and type of the parameter.
     """
 
@@ -36,21 +36,21 @@ class HwtComponentsDirective(Directive):
 
     def run(self):
         try:
-            u = get_instance_from_directive_node(self, Unit)
-            synthesised(u, DEFAULT_PLATFORM)
+            m = get_instance_from_directive_node(self, HwModule)
+            synthesised(m, DEFAULT_PLATFORM)
         except Exception as e:
             absolute_name = get_absolute_name_of_class_of_node(self.state)
             logging.error(e, exc_info=True)
             raise Exception(
                 f"Error occured while processing of {absolute_name:s}")
 
-        if not u._units:
+        if not m._subHwModules:
             return []
 
         description_group_list, obj_list = construct_property_description_list('HDL components')
         name_to_descr_paragraph = {}
         of_type = _('of type')
-        for p in u._units:
+        for p in m._subHwModules:
             name = p._name
 
             p_p = nodes.paragraph()

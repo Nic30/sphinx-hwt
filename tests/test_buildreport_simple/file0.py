@@ -1,14 +1,18 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import Signal
+from hwt.hwIOs.std import HwIOSignal
+from hwt.hwModule import HwModule
+from hwt.pyUtils.typingFuture import override
 
-class ExampleCls0(Unit):
+
+class ExampleCls0(HwModule):
     """
     .. hwt-buildreport::
     """
 
-    def _declr(self):
-        self.din = Signal()
-        self.dout = Signal()._m()
+    @override
+    def hwDeclr(self):
+        self.din = HwIOSignal()
+        self.dout = HwIOSignal()._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout(self.din)

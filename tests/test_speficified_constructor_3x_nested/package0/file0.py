@@ -1,6 +1,7 @@
-from hwt.synthesizer.unit import Unit
-from hwt.interfaces.std import VectSignal
-from hwt.synthesizer.param import Param
+from hwt.hwIOs.std import HwIOVectSignal
+from hwt.hwModule import HwModule
+from hwt.hwParam import HwParam
+from hwt.pyUtils.typingFuture import override
 
 
 def example_constructor():
@@ -15,7 +16,7 @@ def example_constructor2():
     return u
 
 
-class ExampleCls0(Unit):
+class ExampleCls0(HwModule):
     """
     
     Without parameter
@@ -31,18 +32,21 @@ class ExampleCls0(Unit):
     .. hwt-schematic:: example_constructor2
     """
 
-    def _config(self):
-        self.WIDTH = Param(1)
+    @override
+    def hwConfig(self):
+        self.WIDTH = HwParam(1)
 
-    def _declr(self):
-        self.din0 = VectSignal(self.WIDTH)
-        self.dout0 = VectSignal(self.WIDTH)._m()
+    @override
+    def hwDeclr(self):
+        self.din0 = HwIOVectSignal(self.WIDTH)
+        self.dout0 = HwIOVectSignal(self.WIDTH)._m()
 
         if self.WIDTH >= 3:
-            self.din1 = VectSignal(self.WIDTH)
-            self.dout1 = VectSignal(self.WIDTH)._m()
+            self.din1 = HwIOVectSignal(self.WIDTH)
+            self.dout1 = HwIOVectSignal(self.WIDTH)._m()
 
-    def _impl(self):
+    @override
+    def hwImpl(self):
         self.dout0(self.din0)
 
         if self.WIDTH >= 3:
