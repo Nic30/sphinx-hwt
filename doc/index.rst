@@ -21,3 +21,8 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+Other sphinx plugins with similar code
+======================================
+* https://github.com/hasura/sphinx-graphiql/blob/master/sphinx_graphiql/sphinx_graphiql.py
