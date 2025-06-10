@@ -5,13 +5,13 @@ from sphinx.addnodes import desc_signature, pending_xref
 from sphinx.application import Sphinx
 from sphinx.locale import _
 from sphinx.util import typing
-from typing import Union, List, Dict
+from typing import Union, Type
 
 RE_IS_ID = re.compile(r"\w+")
 
 
 # http://www.sphinx-doc.org/en/stable/extdev/index.html#dev-extensions
-def generic_import(name: Union[str, List[str]]):
+def generic_import(name: Union[str, list[str]]):
     """
     Import using string or list of module names
     """
@@ -40,13 +40,23 @@ def get_absolute_name_of_class_of_node(node):
     Get a module path for an object from its node in doc.
     """
     parentClsNode = node.parent.parent
-    assert parentClsNode.attributes['objtype'] == 'class', \
-        (parentClsNode.attributes['objtype'], parentClsNode)
-    assert parentClsNode.attributes['domain'] == 'py', \
-        parentClsNode.attributes['domain']
-    sign = node.parent.parent.children[0]
-    assert isinstance(sign, desc_signature)
-    absolute_name = sign.attributes['ids'][0]
+    if parentClsNode is  None:
+        xref = node.parent[0][1]  # parent is paragraph, in it there is text and xref
+        assert isinstance(xref, (pending_xref)), xref
+        assert xref.attributes['reftype'] == 'class', \
+            (xref.attributes['reftype'], xref)
+        assert xref.attributes['refdomain'] == 'py', \
+            xref.attributes['refdomain']
+        absolute_name = '.'.join([xref.attributes['py:module'], xref.attributes['py:class']])
+    else:
+        assert parentClsNode.attributes['objtype'] == 'class', \
+            (parentClsNode.attributes['objtype'], parentClsNode)
+        assert parentClsNode.attributes['domain'] == 'py', \
+            parentClsNode.attributes['domain']
+        sign = node.parent.parent.children[0]
+        assert isinstance(sign, desc_signature)
+        absolute_name = sign.attributes['ids'][0]
+
     return absolute_name
 
 
@@ -58,7 +68,7 @@ class hwt_objs(nodes.General, nodes.Element):
     :ivar obj_list: format (name, type_str, value_str)
     """
 
-    def __init__(self, obj_name_to_descr_paragraph: Dict[str, nodes.Element], rawsource='', *children, **attributes):
+    def __init__(self, obj_name_to_descr_paragraph: dict[str, nodes.Element], rawsource='', *children, **attributes):
         super(hwt_objs, self).__init__(rawsource, *children, **attributes)
         self["obj_name_to_descr_paragraph"] = obj_name_to_descr_paragraph
 
@@ -105,11 +115,11 @@ def construct_hwt_obj(absolute_name: str, constructor_fn_name: str, allowed_clas
     return m
 
 
-def get_instance_from_directive_node(directive: Directive, allowed_classes):
+def get_instance_from_directive_node(directive: Directive, allowed_classes: tuple[Type, ...]):
     '''
     Converts
 
-    .. code-block:: text
+    .. code-block:: rst
 
         .. directive:
         .. directive: constructor_fn_name
@@ -204,7 +214,7 @@ def ref_to_class(class_obj):
     """
     Create the sphinx pending_xref for a class
     """
-    class_path = typing.stringify(class_obj)
+    class_path = typing.stringify_annotation(class_obj)
     t_ref = pending_xref(refdomain='py', reftype='class', reftarget=class_path)
     t_ref += nodes.Text(class_path)
     return t_ref

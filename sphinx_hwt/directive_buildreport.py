@@ -5,12 +5,13 @@ from posixpath import dirname
 from shutil import copyfile
 from sphinx.application import Sphinx
 from sphinx.locale import _
-from sphinx.util import logger
 import sqlite3
 from typing import Optional
 
 from sphinx_hwt.utils import get_absolute_name_of_class_of_node, \
     get_constructor_name
+from sphinx.util.logging import getLogger
+logger = getLogger(__name__)
 
 
 class BuildreportPaths:
